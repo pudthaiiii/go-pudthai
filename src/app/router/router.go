@@ -1,14 +1,14 @@
 package route
 
 import (
-	"workshop/src/app/controller"
-	"workshop/src/app/middleware"
-	technical "workshop/src/types"
+	"github.com/pudthaiiii/golang-cms/src/app/controller"
+	"github.com/pudthaiiii/golang-cms/src/app/middleware"
+	technical "github.com/pudthaiiii/golang-cms/src/types"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 
-	_ "workshop/src/docs"
+	_ "github.com/pudthaiiii/golang-cms/src/docs"
 )
 
 func InitializeRoute(app *fiber.App, c controller.AppController, m middleware.Middleware) *fiber.App {

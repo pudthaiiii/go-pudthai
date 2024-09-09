@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"workshop/src/app/services"
+	"github.com/pudthaiiii/golang-cms/src/app/services"
 
 	"github.com/gofiber/fiber/v2"
 )

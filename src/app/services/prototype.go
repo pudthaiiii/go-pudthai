@@ -2,8 +2,9 @@ package services
 
 import (
 	"context"
-	repo "workshop/src/app/repository"
-	resource "workshop/src/app/resources/prototype"
+
+	repo "github.com/pudthaiiii/golang-cms/src/app/repository"
+	resource "github.com/pudthaiiii/golang-cms/src/app/resources/prototype"
 )
 
 type prototypeService struct {

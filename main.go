@@ -1,6 +1,6 @@
 package main
 
-import "workshop/src/bootstrap"
+import "github.com/pudthaiiii/golang-cms/src/bootstrap"
 
 func main() {
 	bootstrap.Boot()

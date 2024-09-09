@@ -1,10 +1,10 @@
 package bootstrap
 
 import (
-	router "workshop/src/app/router"
+	router "github.com/pudthaiiii/golang-cms/src/app/router"
 
-	"workshop/src/pkg"
-	"workshop/src/registry"
+	"github.com/pudthaiiii/golang-cms/src/pkg"
+	"github.com/pudthaiiii/golang-cms/src/registry"
 
 	"github.com/gofiber/fiber/v2"
 )

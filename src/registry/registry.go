@@ -1,8 +1,8 @@
 package registry
 
 import (
-	"workshop/src/app/controller"
-	"workshop/src/app/middleware"
+	"github.com/pudthaiiii/golang-cms/src/app/controller"
+	"github.com/pudthaiiii/golang-cms/src/app/middleware"
 
 	"gorm.io/gorm"
 )

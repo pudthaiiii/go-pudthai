@@ -1,7 +1,7 @@
 package controller
 
 import (
-	ApiResource "workshop/src/resource"
+	ApiResource "github.com/pudthaiiii/golang-cms/src/resource"
 
 	"github.com/gofiber/fiber/v2"
 )

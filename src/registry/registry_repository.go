@@ -1,6 +1,6 @@
 package registry
 
-import "workshop/src/app/repository"
+import "github.com/pudthaiiii/golang-cms/src/app/repository"
 
 // apply entity(database) to repository
 func (r *registry) NewUsageItemRepository() repository.UsageItemRepository {

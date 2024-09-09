@@ -2,7 +2,8 @@ package repository
 
 import (
 	"context"
-	"workshop/src/app/entities"
+
+	"github.com/pudthaiiii/golang-cms/src/app/entities"
 
 	"gorm.io/gorm"
 )

@@ -6,7 +6,8 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
-	"workshop/src/utils"
+
+	"github.com/pudthaiiii/golang-cms/src/utils"
 
 	"github.com/gofiber/fiber/v2"
 )

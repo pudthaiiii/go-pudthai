@@ -1,8 +1,8 @@
 package route
 
 import (
-	prototype "workshop/src/app/controller/prototype"
-	technical "workshop/src/types"
+	prototype "github.com/pudthaiiii/golang-cms/src/app/controller/prototype"
+	technical "github.com/pudthaiiii/golang-cms/src/types"
 )
 
 func addPrototypeRoute(c prototype.PrototypeController) technical.Routes {

@@ -1,8 +1,8 @@
 package config
 
 import (
-	"workshop/src/types"
-	"workshop/src/utils"
+	"github.com/pudthaiiii/golang-cms/src/types"
+	"github.com/pudthaiiii/golang-cms/src/utils"
 )
 
 func GetPGConfig() types.PGConfig {

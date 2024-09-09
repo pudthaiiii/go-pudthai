@@ -2,8 +2,9 @@ package bootstrap
 
 import (
 	"log"
-	ApiResource "workshop/src/resource"
-	"workshop/src/utils"
+
+	ApiResource "github.com/pudthaiiii/golang-cms/src/resource"
+	"github.com/pudthaiiii/golang-cms/src/utils"
 
 	"github.com/gofiber/fiber/v2"
 )

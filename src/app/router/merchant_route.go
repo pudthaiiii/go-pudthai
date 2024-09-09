@@ -1,8 +1,8 @@
 package route
 
 import (
-	merchants "workshop/src/app/controller/merchants"
-	technical "workshop/src/types"
+	merchants "github.com/pudthaiiii/golang-cms/src/app/controller/merchants"
+	technical "github.com/pudthaiiii/golang-cms/src/types"
 )
 
 func addMerchantRoute(c merchants.MerchantsController) technical.Routes {

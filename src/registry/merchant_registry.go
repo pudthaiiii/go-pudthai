@@ -1,7 +1,7 @@
 package registry
 
 import (
-	merchant "workshop/src/app/controller/merchants"
+	merchant "github.com/pudthaiiii/golang-cms/src/app/controller/merchants"
 )
 
 // apply service to controller

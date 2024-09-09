@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"log"
 	"time"
-	"workshop/src/types"
+
+	"github.com/pudthaiiii/golang-cms/src/types"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
-	dbConfig "workshop/src/config/database"
+	dbConfig "github.com/pudthaiiii/golang-cms/src/config/database"
 )
 
 type sqlLogger struct {

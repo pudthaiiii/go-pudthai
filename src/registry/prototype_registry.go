@@ -1,8 +1,8 @@
 package registry
 
 import (
-	prototype "workshop/src/app/controller/prototype"
-	"workshop/src/app/services"
+	prototype "github.com/pudthaiiii/golang-cms/src/app/controller/prototype"
+	"github.com/pudthaiiii/golang-cms/src/app/services"
 )
 
 // apply service to controller
