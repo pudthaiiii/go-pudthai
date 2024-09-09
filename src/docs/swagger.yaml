@@ -1,0 +1,12 @@
+info:
+  contact: {}
+paths:
+  /prototype:
+    get:
+      description: get plant
+      operationId: get-plant
+      responses: {}
+      summary: get plant
+      tags:
+      - Plant
+swagger: "2.0"

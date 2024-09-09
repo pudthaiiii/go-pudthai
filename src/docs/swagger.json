@@ -1,0 +1,19 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/prototype": {
+            "get": {
+                "description": "get plant",
+                "tags": [
+                    "Plant"
+                ],
+                "summary": "get plant",
+                "operationId": "get-plant",
+                "responses": {}
+            }
+        }
+    }
+}
