@@ -3,8 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/pudthaiiii/golang-cms/src/app/entities"
-
+	"github.com/pudthaiiii/golang-cms/src/app/model"
 	"gorm.io/gorm"
 )
 
@@ -13,15 +12,15 @@ type productRepository struct {
 }
 
 type ProductRepository interface {
-	SelectAll(ctx context.Context) ([]entities.Product, error)
+	SelectAll(ctx context.Context) ([]model.Product, error)
 }
 
 func NewProductRepository(db *gorm.DB) ProductRepository {
 	return &productRepository{db}
 }
 
-func (r *productRepository) SelectAll(ctx context.Context) ([]entities.Product, error) {
-	var productList []entities.Product
+func (r *productRepository) SelectAll(ctx context.Context) ([]model.Product, error) {
+	var productList []model.Product
 
 	productBuilder := r.db.WithContext(ctx).Unscoped().
 		Limit(1000).Find(&productList)

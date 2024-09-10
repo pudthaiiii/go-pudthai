@@ -1,4 +1,4 @@
-package resources
+package dtos
 
 type UsageItemResponse struct {
 	ID          int    `json:"id"`

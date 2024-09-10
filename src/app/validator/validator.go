@@ -8,37 +8,30 @@ import (
 	"github.com/iancoleman/strcase"
 )
 
+var validate = validator.New()
+
 type (
-	ErrorResponse struct {
+	errorResponse struct {
 		Error       bool
 		FailedField string
 		Tag         string
-		Value       interface{}
 	}
 
-	XValidator struct {
+	xValidator struct {
 		validator *validator.Validate
-	}
-
-	GlobalErrorHandlerResp struct {
-		Success bool   `json:"success"`
-		Message string `json:"message"`
 	}
 )
 
-var validate = validator.New()
-
-func (v XValidator) Validate(data interface{}) []ErrorResponse {
-	validationErrors := []ErrorResponse{}
+func (v xValidator) inValidate(data interface{}) []errorResponse {
+	validationErrors := []errorResponse{}
 
 	errs := validate.Struct(data)
 	if errs != nil {
 		for _, err := range errs.(validator.ValidationErrors) {
-			// In this case data object is actually holding the User struct
-			var elem ErrorResponse
-			elem.FailedField = err.Field() // Export struct field name
-			elem.Tag = err.Tag()           // Export struct tag
-			elem.Value = err.Value()       // Export field value
+			var elem errorResponse
+
+			elem.FailedField = err.Field()
+			elem.Tag = err.Tag()
 			elem.Error = true
 
 			validationErrors = append(validationErrors, elem)
@@ -48,24 +41,33 @@ func (v XValidator) Validate(data interface{}) []ErrorResponse {
 	return validationErrors
 }
 
-func ParseAndValidateRequest[T any](c *fiber.Ctx, data *T) error {
-	myValidator := &XValidator{
+func ValidateRequest[T any](c *fiber.Ctx, data *T) error {
+	myValidator := &xValidator{
 		validator: validate,
 	}
 
+	var err error
+
 	switch c.Method() {
 	case "GET":
-		if err := c.QueryParser(data); err != nil {
-			return fiber.NewError(fiber.StatusBadRequest, "Cannot parse query parameters")
-		}
-	case "POST", "PUT", "PATCH", "DELETE":
-		if err := c.BodyParser(data); err != nil {
-			return fiber.NewError(fiber.StatusBadRequest, "Cannot parse JSON")
-		}
+		err = c.QueryParser(data)
+	default:
+		err = c.BodyParser(data)
 	}
 
-	if errs := myValidator.Validate(data); len(errs) > 0 && errs[0].Error {
+	if err != nil {
+		errorMsg := "Cannot parse query parameters"
+
+		if c.Method() != "GET" {
+			errorMsg = "Cannot parse JSON"
+		}
+
+		return handleValidationError(c, errorMsg)
+	}
+
+	if errs := myValidator.inValidate(data); len(errs) > 0 && errs[0].Error {
 		errorMap := make(map[string][]string)
+
 		for _, err := range errs {
 			failedField := strcase.ToLowerCamel(err.FailedField)
 
@@ -77,20 +79,24 @@ func ParseAndValidateRequest[T any](c *fiber.Ctx, data *T) error {
 			errorMap[failedField] = append(errorMap[failedField], errorMsg)
 		}
 
-		response := map[string]interface{}{
-			"status": map[string]interface{}{
-				"code":    422,
-				"message": "Unprocessable Entity",
-			},
-			"error": map[string]interface{}{
-				"code":    100422,
-				"message": "VALIDATE_ERROR",
-				"errors":  errorMap,
-			},
-		}
-
-		return c.Status(fiber.StatusUnprocessableEntity).JSON(response)
+		return handleValidationError(c, errorMap)
 	}
 
 	return nil
+}
+
+func handleValidationError(c *fiber.Ctx, errors interface{}) error {
+	response := map[string]interface{}{
+		"status": map[string]interface{}{
+			"code":    422,
+			"message": "Unprocessable Entity",
+		},
+		"error": map[string]interface{}{
+			"code":    100422,
+			"message": "VALIDATE_ERROR",
+			"errors":  errors,
+		},
+	}
+
+	return c.Status(fiber.StatusUnprocessableEntity).JSON(response)
 }

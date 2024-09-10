@@ -19,20 +19,20 @@ type sqlLogger struct {
 	logger.Interface
 }
 
-type pgDatastore struct {
+type PgDatastore struct {
 	DB *gorm.DB
 }
 
-func ConnectPgSql() pgDatastore {
+func ConnectPgSql() PgDatastore {
 	pgConfig := dbConfig.GetPGConfig()
 
-	var pg pgDatastore
+	var pg PgDatastore
 	pg.connectDB(pgConfig)
 
 	return pg
 }
 
-func (p *pgDatastore) connectDB(config types.PGConfig) {
+func (p *PgDatastore) connectDB(config types.PGConfig) {
 	pgSqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+"password=%s dbname=%s sslmode=disable",
 		config.Host, config.Port, config.User, config.Password, config.DBDatabase)
 

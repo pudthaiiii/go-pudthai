@@ -1,16 +1,16 @@
 package controller
 
 import (
-	request "github.com/pudthaiiii/golang-cms/src/app/requests/prototype"
+	dtos "github.com/pudthaiiii/golang-cms/src/app/controller/admin/dtos/request/prototype"
 	"github.com/pudthaiiii/golang-cms/src/app/validator"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func (p prototypeController) Create(c *fiber.Ctx) error {
-	var data request.PrototypeCreateRequest
+	var data dtos.PrototypeCreateRequest
 
-	if err := validator.ParseAndValidateRequest(c, &data); err != nil {
+	if err := validator.ValidateRequest(c, &data); err != nil {
 		return err
 	}
 

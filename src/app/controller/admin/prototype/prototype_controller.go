@@ -1,13 +1,13 @@
 package controller
 
 import (
-	"github.com/pudthaiiii/golang-cms/src/app/services"
+	adminService "github.com/pudthaiiii/golang-cms/src/app/services/admin"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type prototypeController struct {
-	prototypeService services.PrototypeInteractor
+	prototypeService adminService.PrototypeService
 }
 
 type PrototypeController interface {
@@ -15,7 +15,7 @@ type PrototypeController interface {
 	Create(c *fiber.Ctx) error
 }
 
-func NewPrototypeController(prototypeService services.PrototypeInteractor) PrototypeController {
+func NewPrototypeController(prototypeService adminService.PrototypeService) PrototypeController {
 	return &prototypeController{
 		prototypeService,
 	}

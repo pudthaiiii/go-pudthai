@@ -1,11 +1,11 @@
 package route
 
 import (
-	prototype "github.com/pudthaiiii/golang-cms/src/app/controller/prototype"
+	controller "github.com/pudthaiiii/golang-cms/src/app/controller/admin/prototype"
 	technical "github.com/pudthaiiii/golang-cms/src/types"
 )
 
-func addPrototypeRoute(c prototype.PrototypeController) technical.Routes {
+func addPrototypeRoute(c controller.PrototypeController) technical.Routes {
 	return technical.Routes{
 		technical.Route{
 			Name:        "Paginate",

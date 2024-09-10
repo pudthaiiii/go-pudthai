@@ -1,4 +1,4 @@
-package middleware
+package middlewareAdmin
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ func (middleware) Authenticate(next fiber.Handler) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Your middleware logic here
 		// Call the next handler
-		fmt.Println("Middleware: Authentication")
+		fmt.Println("Middleware: Admin Authentication")
 		return next(c)
 	}
 }

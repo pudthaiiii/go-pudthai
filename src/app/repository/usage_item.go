@@ -3,8 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/pudthaiiii/golang-cms/src/app/entities"
-
+	"github.com/pudthaiiii/golang-cms/src/app/model"
 	"gorm.io/gorm"
 )
 
@@ -13,15 +12,15 @@ type usageItemRepository struct {
 }
 
 type UsageItemRepository interface {
-	SelectAll(ctx context.Context) ([]entities.UsageItem, error)
+	SelectAll(ctx context.Context) ([]model.UsageItem, error)
 }
 
 func NewUsageItemRepository(db *gorm.DB) UsageItemRepository {
 	return &usageItemRepository{db}
 }
 
-func (repo *usageItemRepository) SelectAll(ctx context.Context) ([]entities.UsageItem, error) {
-	var usageItems []entities.UsageItem
+func (repo *usageItemRepository) SelectAll(ctx context.Context) ([]model.UsageItem, error) {
+	var usageItems []model.UsageItem
 
 	query := repo.db.WithContext(ctx).Unscoped()
 	query = query.Select("id", "org_code", "product_code")
