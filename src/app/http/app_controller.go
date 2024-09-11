@@ -1,7 +1,7 @@
 package controller
 
 import (
-	a "github.com/pudthaiiii/golang-cms/src/app/controller/admin/prototype"
+	a "github.com/pudthaiiii/golang-cms/src/app/http/admin/controllers/prototype"
 )
 
 type AppController struct {

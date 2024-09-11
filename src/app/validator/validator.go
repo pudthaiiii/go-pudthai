@@ -41,7 +41,7 @@ func (v xValidator) inValidate(data interface{}) []errorResponse {
 	return validationErrors
 }
 
-func ValidateRequest[T any](c *fiber.Ctx, data *T) error {
+func Validate[T any](c *fiber.Ctx, data *T) error {
 	myValidator := &xValidator{
 		validator: validate,
 	}

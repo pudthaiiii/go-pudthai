@@ -1,7 +1,7 @@
 package registry
 
 import (
-	adminController "github.com/pudthaiiii/golang-cms/src/app/controller/admin/prototype"
+	adminController "github.com/pudthaiiii/golang-cms/src/app/http/admin/controllers/prototype"
 	adminService "github.com/pudthaiiii/golang-cms/src/app/services/admin"
 )
 

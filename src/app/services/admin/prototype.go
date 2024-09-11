@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 
-	dtos "github.com/pudthaiiii/golang-cms/src/app/controller/admin/dtos/response/prototype"
+	dtos "github.com/pudthaiiii/golang-cms/src/app/http/admin/dtos/response/prototype"
 	repo "github.com/pudthaiiii/golang-cms/src/app/repository"
 )
 

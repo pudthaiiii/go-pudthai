@@ -1,7 +1,7 @@
 package registry
 
 import (
-	"github.com/pudthaiiii/golang-cms/src/app/controller"
+	mc "github.com/pudthaiiii/golang-cms/src/app/http"
 	am "github.com/pudthaiiii/golang-cms/src/app/middleware/admin"
 
 	"gorm.io/gorm"
@@ -12,7 +12,7 @@ type registry struct {
 }
 
 type Registry interface {
-	NewAppController() controller.AppController
+	NewAppController() mc.AppController
 	NewAdminMiddleware() am.Middleware
 }
 
@@ -24,8 +24,8 @@ func NewRegistry(
 	}
 }
 
-func (r *registry) NewAppController() controller.AppController {
-	ac := controller.AppController{
+func (r *registry) NewAppController() mc.AppController {
+	ac := mc.AppController{
 		AdminPrototype: r.NewPrototypeController(),
 
 		// add more controller here

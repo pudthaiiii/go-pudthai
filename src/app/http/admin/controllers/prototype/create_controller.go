@@ -10,7 +10,7 @@ import (
 func (p prototypeController) Create(c *fiber.Ctx) error {
 	var data dtos.PrototypeCreateRequest
 
-	if err := validator.ValidateRequest(c, &data); err != nil {
+	if err := validator.Validate(c, &data); err != nil {
 		return err
 	}
 

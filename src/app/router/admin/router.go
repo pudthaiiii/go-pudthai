@@ -1,13 +1,13 @@
 package route
 
 import (
-	"github.com/pudthaiiii/golang-cms/src/app/controller"
+	mc "github.com/pudthaiiii/golang-cms/src/app/http"
 	am "github.com/pudthaiiii/golang-cms/src/app/middleware/admin"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func InitializeAdminRoute(app *fiber.App, c controller.AppController, m am.Middleware) *fiber.App {
+func InitializeAdminRoute(app *fiber.App, c mc.AppController, m am.Middleware) *fiber.App {
 	routes := addPrototypeRoute(c.AdminPrototype)
 
 	// routes := append(
