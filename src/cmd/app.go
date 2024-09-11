@@ -9,6 +9,7 @@ import (
 	"github.com/joho/godotenv"
 
 	adminRouter "github.com/pudthaiiii/golang-cms/src/app/router/admin"
+	"github.com/pudthaiiii/golang-cms/src/types"
 
 	_ "github.com/pudthaiiii/golang-cms/src/docs"
 	"github.com/pudthaiiii/golang-cms/src/pkg"
@@ -17,16 +18,18 @@ import (
 )
 
 type App struct {
-	route  *fiber.App
-	config map[string]interface{}
+	route    *fiber.App
+	dbConfig types.PGConfig
+	config   map[string]interface{}
 }
 
-func NewApplication(route *fiber.App, config map[string]interface{}) *App {
-	return &App{route: route, config: config}
+func NewApplication(route *fiber.App, dbConfig types.PGConfig, config map[string]interface{}) *App {
+	return &App{route: route, dbConfig: dbConfig, config: config}
 }
 
 func (app *App) Boot() {
 	app.setup()
+
 	app.listen()
 }
 
@@ -47,11 +50,9 @@ func (app *App) newMiddleware() {
 }
 
 func (app *App) newRegistry() registry.Registry {
-	return registry.NewRegistry(app.newDatabase().DB)
-}
+	db := pkg.NewPgDatastore(app.dbConfig)
 
-func (app *App) newDatabase() pkg.PgDatastore {
-	return pkg.ConnectPgSql()
+	return registry.NewRegistry(db.DB)
 }
 
 func (app *App) listen() {
@@ -63,7 +64,7 @@ func (app *App) listen() {
 	}
 }
 
-func (app *App) InitializeEnv() {
+func InitializeEnv() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatalf("Error loading .env file")
 	}

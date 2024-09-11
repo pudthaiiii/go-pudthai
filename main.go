@@ -4,19 +4,22 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/pudthaiiii/golang-cms/src/cmd"
 
+	dbConfig "github.com/pudthaiiii/golang-cms/src/config/database"
 	resource "github.com/pudthaiiii/golang-cms/src/resource"
 )
 
 func main() {
+	cmd.InitializeEnv()
+
 	app := fiber.New(fiber.Config{
 		ErrorHandler: resource.ErrorHandler,
 	})
 
 	config := map[string]interface{}{
-		"app": "Golang CMS",
+		"dbConfig": "dbConfig",
 	}
 
-	application := cmd.NewApplication(app, config)
-	application.InitializeEnv()
+	application := cmd.NewApplication(app, dbConfig.GetPGConfig(), config)
+
 	application.Boot()
 }
