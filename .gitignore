@@ -1,8 +1,7 @@
 .idea/
 .vscode/
 .env
-go.work
-go.work.sum
+go.sum
 **/.DS_Store
 **/__debug_bin**
 tmp/*
