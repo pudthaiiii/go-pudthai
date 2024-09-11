@@ -1,7 +1,7 @@
-package controller
+package controllers
 
 import (
-	a "github.com/pudthaiiii/golang-cms/src/app/http/admin/controllers/prototype"
+	a "github.com/pudthaiiii/go-ibooking/src/app/http/admin/controllers/prototype"
 )
 
 type AppController struct {

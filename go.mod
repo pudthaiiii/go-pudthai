@@ -1,4 +1,4 @@
-module github.com/pudthaiiii/golang-cms
+module github.com/pudthaiiii/go-ibooking
 
 go 1.22.6
 

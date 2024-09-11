@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/pudthaiiii/golang-cms/src/types"
-	"github.com/pudthaiiii/golang-cms/src/utils"
+	"github.com/pudthaiiii/go-ibooking/src/types"
+	"github.com/pudthaiiii/go-ibooking/src/utils"
 )
 
 func GetPGConfig() types.PGConfig {

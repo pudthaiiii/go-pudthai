@@ -6,13 +6,13 @@
 // 	"log"
 // 	"time"
 
-// 	"github.com/pudthaiiii/golang-cms/src/types"
+// 	"github.com/pudthaiiii/go-ibooking/src/types"
 
 // 	"gorm.io/driver/postgres"
 // 	"gorm.io/gorm"
 // 	"gorm.io/gorm/logger"
 
-// 	dbConfig "github.com/pudthaiiii/golang-cms/src/config/database"
+// 	dbConfig "github.com/pudthaiiii/go-ibooking/src/config/database"
 // )
 
 // type Datastore interface {
@@ -76,7 +76,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/pudthaiiii/golang-cms/src/types"
+	"github.com/pudthaiiii/go-ibooking/src/types"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"

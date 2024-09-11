@@ -1,8 +1,8 @@
 package registry
 
 import (
-	mc "github.com/pudthaiiii/golang-cms/src/app/http"
-	am "github.com/pudthaiiii/golang-cms/src/app/middleware/admin"
+	mc "github.com/pudthaiiii/go-ibooking/src/app/http"
+	am "github.com/pudthaiiii/go-ibooking/src/app/middleware/admin"
 
 	"gorm.io/gorm"
 )

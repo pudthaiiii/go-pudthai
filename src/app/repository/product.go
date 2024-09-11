@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/pudthaiiii/golang-cms/src/app/model"
+	"github.com/pudthaiiii/go-ibooking/src/app/model"
 	"gorm.io/gorm"
 )
 

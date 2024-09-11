@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"github.com/pudthaiiii/golang-cms/src/cmd"
+	"github.com/pudthaiiii/go-ibooking/src/cmd"
 
-	dbConfig "github.com/pudthaiiii/golang-cms/src/config/database"
-	resource "github.com/pudthaiiii/golang-cms/src/resource"
+	dbConfig "github.com/pudthaiiii/go-ibooking/src/config/database"
+	resource "github.com/pudthaiiii/go-ibooking/src/resource"
 )
 
 func main() {

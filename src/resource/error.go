@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pudthaiiii/golang-cms/src/utils"
+	"github.com/pudthaiiii/go-ibooking/src/utils"
 
 	"github.com/gofiber/fiber/v2"
 )

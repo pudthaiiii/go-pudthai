@@ -1,8 +1,8 @@
 package route
 
 import (
-	controller "github.com/pudthaiiii/golang-cms/src/app/controller/admin/prototype"
-	technical "github.com/pudthaiiii/golang-cms/src/types"
+	controller "github.com/pudthaiiii/go-ibooking/src/app/http/admin/controllers/prototype"
+	technical "github.com/pudthaiiii/go-ibooking/src/types"
 )
 
 func addPrototypeRoute(c controller.PrototypeController) technical.Routes {

@@ -8,13 +8,13 @@ import (
 	"github.com/gofiber/swagger"
 	"github.com/joho/godotenv"
 
-	adminRouter "github.com/pudthaiiii/golang-cms/src/app/router/admin"
-	"github.com/pudthaiiii/golang-cms/src/types"
+	adminRouter "github.com/pudthaiiii/go-ibooking/src/app/router/admin"
+	"github.com/pudthaiiii/go-ibooking/src/types"
 
-	_ "github.com/pudthaiiii/golang-cms/src/docs"
-	"github.com/pudthaiiii/golang-cms/src/pkg"
-	"github.com/pudthaiiii/golang-cms/src/registry"
-	"github.com/pudthaiiii/golang-cms/src/utils"
+	_ "github.com/pudthaiiii/go-ibooking/src/docs"
+	"github.com/pudthaiiii/go-ibooking/src/pkg"
+	"github.com/pudthaiiii/go-ibooking/src/registry"
+	"github.com/pudthaiiii/go-ibooking/src/utils"
 )
 
 type App struct {
