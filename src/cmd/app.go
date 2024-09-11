@@ -9,6 +9,7 @@ import (
 	"github.com/joho/godotenv"
 
 	adminRouter "github.com/pudthaiiii/go-ibooking/src/app/router/admin"
+	backendRouter "github.com/pudthaiiii/go-ibooking/src/app/router/backend"
 	"github.com/pudthaiiii/go-ibooking/src/types"
 
 	_ "github.com/pudthaiiii/go-ibooking/src/docs"
@@ -34,12 +35,17 @@ func (app *App) Boot() {
 }
 
 func (app *App) setup() {
+	// swagger
 	app.route.Get("/swagger/*", swagger.HandlerDefault)
 
 	// center middleware
 	app.newMiddleware()
 
-	adminRouter.InitializeAdminRoute(app.route, app.newRegistry().NewAppController(), app.newRegistry().NewAdminMiddleware())
+	// apply registry
+	r := app.newRegistry()
+
+	adminRouter.InitializeAdminRoute(app.route, r.NewAdminController(), r.NewAdminMiddleware())
+	backendRouter.InitializeBackendRoute(app.route, r.NewBackendController(), r.NewAdminMiddleware())
 }
 
 func (app *App) newMiddleware() {
