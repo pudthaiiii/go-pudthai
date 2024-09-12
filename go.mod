@@ -13,7 +13,10 @@ require (
 	gorm.io/gorm v1.25.11
 )
 
-require github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.40.7 // indirect
+require (
+	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.40.7 // indirect
+	github.com/robfig/cron v1.2.0 // indirect
+)
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
@@ -49,6 +52,8 @@ require (
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
+	github.com/gocraft/work v0.5.1
+	github.com/gomodule/redigo v1.9.2
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
