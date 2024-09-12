@@ -54,9 +54,10 @@ go mod tidy
 
 Set up the environment variables by creating a .env file in the root directory and adding the required variables as shown above.
 
-Run the project:```
-air .
+Run the project:
 
+```
+air .
 ```
 
 Usage
@@ -71,4 +72,7 @@ This project is licensed under the MIT License. See the LICENSE file for details
 2. **Running the Project**: Updated the command to run the project using [`air`](command:_github.copilot.openSymbolFromReferences?%5B%22%22%2C%5B%7B%22uri%22%3A%7B%22scheme%22%3A%22file%22%2C%22authority%22%3A%22%22%2C%22path%22%3A%22%2FUsers%2Fpudthai%2Flab%2Fworkshop-golang%2FREADME.md%22%2C%22query%22%3A%22%22%2C%22fragment%22%3A%22%22%7D%2C%22pos%22%3A%7B%22line%22%3A53%2C%22character%22%3A0%7D%7D%5D%2C%2287de2004-f5ac-4b4b-98d2-3fc643a8cb6e%22%5D "Go to definition").
 
 Make sure to replace placeholder values and URLs with actual values specific to your project.
+
+```
+
 ```
