@@ -1,4 +1,4 @@
-# iBooking API
+# GO Prototype IBooking API
 
 This project is an API service for the iBooking application. Below are the instructions to set up and run the project.
 
