@@ -17,7 +17,7 @@ import (
 )
 
 type S3Datastore struct {
-	Client *s3.Client
+	client *s3.Client
 	Bucket string
 }
 
@@ -29,10 +29,11 @@ func NewS3Datastore() *S3Datastore {
 
 	creds := credentials.NewStaticCredentialsProvider(accessKeyID, secretAccessKey, "")
 
-	cfg, err := config.LoadDefaultConfig(context.TODO(),
+	cfg, err := config.LoadDefaultConfig(context.Background(),
 		config.WithRegion(region),
 		config.WithCredentialsProvider(creds),
 	)
+
 	if err != nil {
 		log.Fatalf("unable to load SDK config, %v", err)
 	}
@@ -40,7 +41,7 @@ func NewS3Datastore() *S3Datastore {
 	client := s3.NewFromConfig(cfg)
 
 	return &S3Datastore{
-		Client: client,
+		client: client,
 		Bucket: bucket,
 	}
 }
@@ -50,7 +51,7 @@ func (s *S3Datastore) CheckConnection(ctx context.Context) error {
 		Bucket: &s.Bucket,
 	}
 
-	_, err := s.Client.HeadBucket(ctx, input)
+	_, err := s.client.HeadBucket(ctx, input)
 	if err != nil {
 		return err
 	}
@@ -59,9 +60,9 @@ func (s *S3Datastore) CheckConnection(ctx context.Context) error {
 }
 
 func (s *S3Datastore) GenerateSignedURL(key string, expiresIn time.Duration) (string, error) {
-	psClient := s3.NewPresignClient(s.Client)
+	psClient := s3.NewPresignClient(s.client)
 
-	signedURL, err := psClient.PresignGetObject(context.TODO(), &s3.GetObjectInput{
+	signedURL, err := psClient.PresignGetObject(context.Background(), &s3.GetObjectInput{
 		Bucket: aws.String(s.Bucket),
 		Key:    aws.String(key),
 	}, s3.WithPresignExpires(expiresIn))
@@ -83,7 +84,7 @@ func (s *S3Datastore) UploadFile(ctx context.Context, key string, body []byte) (
 		ACL:    types.ObjectCannedACLPrivate,
 	}
 
-	result, err := s.Client.PutObject(ctx, input)
+	result, err := s.client.PutObject(ctx, input)
 	if err != nil {
 		return nil, err
 	}
@@ -97,7 +98,7 @@ func (s *S3Datastore) GetFile(ctx context.Context, key string) ([]byte, error) {
 		Key:    &key,
 	}
 
-	result, err := s.Client.GetObject(ctx, input)
+	result, err := s.client.GetObject(ctx, input)
 	if err != nil {
 		return nil, err
 	}

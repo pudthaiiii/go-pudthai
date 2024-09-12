@@ -37,6 +37,7 @@ func NewPgDatastore() *gorm.DB {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: &sqlLogger{},
 	})
+
 	if err != nil {
 		log.Fatalf("failed to connect to PostgreSQL: %v", err)
 		return nil
@@ -53,6 +54,7 @@ func NewPgDatastore() *gorm.DB {
 	sqlDB.SetMaxIdleConns(10)
 
 	log.Println("Successfully connected to PostgreSQL")
+
 	return db
 }
 
