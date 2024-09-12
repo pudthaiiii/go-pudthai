@@ -28,7 +28,7 @@ func NewEmailClient() *emailClient {
 		password:    os.Getenv("MAIL_PASSWORD"),
 		fromAddress: os.Getenv("MAIL_FROM_ADDRESS"),
 		encryption:  os.Getenv("MAIL_ENCRYPTION"),
-		TemplateDir: "mails",
+		TemplateDir: "src/mails",
 	}
 }
 
