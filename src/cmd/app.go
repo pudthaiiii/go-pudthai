@@ -11,7 +11,7 @@ import (
 	adminRouter "github.com/pudthaiiii/go-ibooking/src/app/router/admin"
 	backendRouter "github.com/pudthaiiii/go-ibooking/src/app/router/backend"
 
-	_ "github.com/pudthaiiii/go-ibooking/src/docs"
+	_ "github.com/pudthaiiii/go-ibooking/docs"
 	"github.com/pudthaiiii/go-ibooking/src/pkg"
 	"github.com/pudthaiiii/go-ibooking/src/registry"
 	"github.com/pudthaiiii/go-ibooking/src/utils"
