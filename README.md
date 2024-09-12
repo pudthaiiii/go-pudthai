@@ -8,6 +8,9 @@ This project is an API service for the iBooking application. Below are the instr
 -   PostgreSQL
 -   Redis
 -   AWS S3
+-   AWS CloudWatch
+-   Google Recaptcha
+-   Mailer
 
 ## Environment Variables
 
