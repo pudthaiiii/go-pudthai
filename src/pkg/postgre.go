@@ -1,124 +1,58 @@
-// package pkg
-
-// import (
-// 	"context"
-// 	"fmt"
-// 	"log"
-// 	"time"
-
-// 	"github.com/pudthaiiii/go-ibooking/src/types"
-
-// 	"gorm.io/driver/postgres"
-// 	"gorm.io/gorm"
-// 	"gorm.io/gorm/logger"
-
-// 	dbConfig "github.com/pudthaiiii/go-ibooking/src/config/database"
-// )
-
-// type Datastore interface {
-// 	connectDB(config types.PGConfig)
-// }
-
-// type PgDatastore struct {
-// 	DB *gorm.DB
-// }
-
-// func ConnectPgSql() PgDatastore {
-// 	pgConfig := dbConfig.GetPGConfig()
-
-// 	var pg PgDatastore
-// 	pg.connectDB(pgConfig)
-
-// 	return pg
-// }
-
-// func (p *PgDatastore) connectDB(config types.PGConfig) {
-// 	pgSqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+"password=%s dbname=%s sslmode=disable",
-// 		config.Host, config.Port, config.User, config.Password, config.DBDatabase)
-
-// 	db, err := gorm.Open(postgres.Open(pgSqlInfo), &gorm.Config{
-// 		Logger: &sqlLogger{},
-// 	})
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	// db.AutoMigrate(&entities.UsageItem{}, &entities.Product{}, &entities.Category{})
-
-// 	p.DB = db
-
-// 	sqlDB, err := p.DB.DB()
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	sqlDB.SetConnMaxLifetime(0)
-// 	sqlDB.SetMaxIdleConns(0)
-
-// 	log.Printf("%s, DB: %s", "Successfully connected to PostgreSQL", config.DBDatabase)
-// }
-
-// type sqlLogger struct {
-// 	logger.Interface
-// }
-
-// func (l sqlLogger) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
-// 	sql, _ := fc()
-
-// 	log.Printf("SQL: %s\n==============================================================================\n", sql)
-// }
-
 package pkg
 
 import (
 	"context"
 	"fmt"
 	"log"
+	"net/url"
+	"os"
 	"time"
 
-	"github.com/pudthaiiii/go-ibooking/src/types"
+	"github.com/pudthaiiii/go-ibooking/src/utils"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
-type PgDatastore struct {
-	DB *gorm.DB
-}
+func NewPgDatastore() *gorm.DB {
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	user := os.Getenv("DB_USERNAME")
+	password := os.Getenv("DB_PASSWORD")
+	dbName := os.Getenv("DB_DATABASE")
 
-func NewPgDatastore(config types.PGConfig) *PgDatastore {
-	db := connectPgSql(config)
-	return &PgDatastore{DB: db}
-}
-
-func (pg *PgDatastore) Close() error {
-	sqlDB, err := pg.DB.DB()
-	if err != nil {
-		return fmt.Errorf("failed to retrieve database connection: %w", err)
+	u := url.URL{
+		Scheme: "postgres",
+		Host:   fmt.Sprintf("%s:%s", host, port),
+		User:   url.UserPassword(user, password),
+		Path:   dbName,
 	}
-	return sqlDB.Close()
-}
 
-func connectPgSql(config types.PGConfig) *gorm.DB {
-	pgSqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		config.Host, config.Port, config.User, config.Password, config.DBDatabase)
+	query := u.Query()
+	query.Set("sslmode", "disable")
+	u.RawQuery = query.Encode()
 
-	db, err := gorm.Open(postgres.Open(pgSqlInfo), &gorm.Config{
+	dsn := u.String()
+
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: &sqlLogger{},
 	})
 	if err != nil {
-		log.Fatalf("Failed to connect to PostgreSQL: %v", err)
+		log.Fatalf("failed to connect to PostgreSQL: %v", err)
+		return nil
 	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
-		log.Fatalf("Failed to retrieve database connection: %v", err)
+		log.Fatalf("failed to get SQL database instance: %v", err)
+		return nil
 	}
 
-	sqlDB.SetConnMaxLifetime(0)
-	sqlDB.SetMaxIdleConns(0)
+	sqlDB.SetConnMaxIdleTime(10)
+	sqlDB.SetMaxOpenConns(100)
+	sqlDB.SetMaxIdleConns(10)
 
-	log.Printf("Successfully connected to PostgreSQL, DB: %s", config.DBDatabase)
+	log.Println("Successfully connected to PostgreSQL")
 	return db
 }
 
@@ -127,6 +61,10 @@ type sqlLogger struct {
 }
 
 func (l sqlLogger) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
+	if utils.RequireEnv("DB_LOGGING", "false") == "false" {
+		return
+	}
+
 	sql, _ := fc()
 	log.Printf("SQL: %s\n==============================================================================\n", sql)
 }

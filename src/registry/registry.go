@@ -1,8 +1,10 @@
 package registry
 
 import (
+	"github.com/go-redis/redis/v8"
 	admin "github.com/pudthaiiii/go-ibooking/src/app/http/admin"
 	backend "github.com/pudthaiiii/go-ibooking/src/app/http/backend"
+	"github.com/pudthaiiii/go-ibooking/src/pkg"
 
 	am "github.com/pudthaiiii/go-ibooking/src/app/middleware/admin"
 
@@ -10,7 +12,9 @@ import (
 )
 
 type registry struct {
-	db *gorm.DB
+	db    *gorm.DB
+	redis redis.UniversalClient
+	s3    *pkg.S3Datastore
 }
 
 type Registry interface {
@@ -21,9 +25,13 @@ type Registry interface {
 
 func NewRegistry(
 	db *gorm.DB,
+	redisClient redis.UniversalClient,
+	s3 *pkg.S3Datastore,
 ) Registry {
 	return &registry{
-		db,
+		db:    db,
+		redis: redisClient,
+		s3:    s3,
 	}
 }
 

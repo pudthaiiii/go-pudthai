@@ -10,7 +10,6 @@ import (
 
 	adminRouter "github.com/pudthaiiii/go-ibooking/src/app/router/admin"
 	backendRouter "github.com/pudthaiiii/go-ibooking/src/app/router/backend"
-	"github.com/pudthaiiii/go-ibooking/src/types"
 
 	_ "github.com/pudthaiiii/go-ibooking/src/docs"
 	"github.com/pudthaiiii/go-ibooking/src/pkg"
@@ -19,13 +18,11 @@ import (
 )
 
 type App struct {
-	route    *fiber.App
-	dbConfig types.PGConfig
-	config   map[string]interface{}
+	route *fiber.App
 }
 
-func NewApplication(route *fiber.App, dbConfig types.PGConfig, config map[string]interface{}) *App {
-	return &App{route: route, dbConfig: dbConfig, config: config}
+func NewApplication(route *fiber.App) *App {
+	return &App{route: route}
 }
 
 func (app *App) Boot() {
@@ -35,7 +32,6 @@ func (app *App) Boot() {
 }
 
 func (app *App) setup() {
-	// swagger
 	app.route.Get("/swagger/*", swagger.HandlerDefault)
 
 	// center middleware
@@ -44,6 +40,7 @@ func (app *App) setup() {
 	// apply registry
 	r := app.newRegistry()
 
+	// apply router
 	adminRouter.InitializeAdminRoute(app.route, r.NewAdminController(), r.NewAdminMiddleware())
 	backendRouter.InitializeBackendRoute(app.route, r.NewBackendController(), r.NewAdminMiddleware())
 }
@@ -56,9 +53,11 @@ func (app *App) newMiddleware() {
 }
 
 func (app *App) newRegistry() registry.Registry {
-	db := pkg.NewPgDatastore(app.dbConfig)
+	db := pkg.NewPgDatastore()
+	redis := pkg.NewRedisDatastore()
+	s3 := pkg.NewS3Datastore()
 
-	return registry.NewRegistry(db.DB)
+	return registry.NewRegistry(db, redis.Client, s3)
 }
 
 func (app *App) listen() {
