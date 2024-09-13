@@ -35,7 +35,7 @@ func NewS3Datastore() *S3Datastore {
 	)
 
 	if err != nil {
-		log.Fatalf("unable to load SDK config, %v", err)
+		log.Printf("unable to load SDK config, %v", err)
 	}
 
 	client := s3.NewFromConfig(cfg)

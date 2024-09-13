@@ -59,7 +59,7 @@ func connectRedisStandalone() *redis.Client {
 
 	_, err := client.Ping(ctx).Result()
 	if err != nil {
-		log.Fatalf("Failed to connect to Redis (Standalone): %v", err)
+		log.Printf("Failed to connect to Redis (Standalone): %v", err)
 	}
 
 	log.Printf("Successfully connected to Redis (Standalone), DB: %s", db)
@@ -83,7 +83,7 @@ func connectRedisCluster() *redis.ClusterClient {
 
 	_, err := client.Ping(ctx).Result()
 	if err != nil {
-		log.Fatalf("Failed to connect to Redis Cluster: %v", err)
+		log.Printf("Failed to connect to Redis Cluster: %v", err)
 	}
 
 	log.Printf("Successfully connected to Redis Cluster")

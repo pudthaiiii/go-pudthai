@@ -35,7 +35,7 @@ func NewCloudWatchLogsDatastore() *CloudWatchLogsDatastore {
 	)
 
 	if err != nil {
-		log.Fatalf("unable to load SDK config, %v", err)
+		log.Printf("unable to load SDK config, %v", err)
 	}
 
 	client := cloudwatchlogs.NewFromConfig(cfg)

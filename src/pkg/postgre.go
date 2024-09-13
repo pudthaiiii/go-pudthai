@@ -38,13 +38,13 @@ func NewPgDatastore() *gorm.DB {
 	})
 
 	if err != nil {
-		log.Fatalf("failed to connect to PostgreSQL: %v", err)
+		log.Printf("failed to connect to PostgreSQL: %v", err)
 		return nil
 	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
-		log.Fatalf("failed to get SQL database instance: %v", err)
+		log.Printf("failed to get SQL database instance: %v", err)
 		return nil
 	}
 

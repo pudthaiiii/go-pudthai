@@ -65,12 +65,12 @@ func (app *App) listen() {
 
 	log.Printf("Server started on port %s", port)
 	if err := app.route.Listen(":" + port); err != nil {
-		log.Fatalf("Server failed to start: %v", err)
+		log.Printf("Server failed to start: %v", err)
 	}
 }
 
 func InitializeEnv() {
 	if err := godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file")
+		log.Printf("No .env file found")
 	}
 }
