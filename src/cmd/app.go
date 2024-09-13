@@ -54,10 +54,10 @@ func (app *App) newMiddleware() {
 
 func (app *App) newRegistry() registry.Registry {
 	db := pkg.NewPgDatastore()
-	redis := pkg.NewRedisDatastore()
+	// redis := pkg.NewRedisDatastore()
 	s3 := pkg.NewS3Datastore()
 
-	return registry.NewRegistry(db, redis.Client, s3)
+	return registry.NewRegistry(db, s3)
 }
 
 func (app *App) listen() {
