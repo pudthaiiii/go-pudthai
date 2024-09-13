@@ -17,7 +17,7 @@ func initJobQueueRoutes(app *fiber.App) {
 	defer pool.Stop()
 
 	app.Post("/enqueue", func(c *fiber.Ctx) error {
-		_, err := Enqueuer.Enqueue("test_job", work.Q{"name": "send by post man"})
+		_, err := Enqueuer.Enqueue("test_job", work.Q{"name": "send by post mans"})
 		if err != nil {
 			return err
 		}

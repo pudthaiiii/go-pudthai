@@ -8,8 +8,9 @@ import (
 	"strings"
 	"time"
 
+	"go-ibooking/src/utils"
+
 	"github.com/go-redis/redis/v8"
-	"github.com/pudthaiiii/go-ibooking/src/utils"
 )
 
 type RedisDatastore struct {

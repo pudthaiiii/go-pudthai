@@ -1,8 +1,8 @@
 package route
 
 import (
-	controller "github.com/pudthaiiii/go-ibooking/src/app/http/admin"
-	am "github.com/pudthaiiii/go-ibooking/src/app/middleware/admin"
+	controller "go-ibooking/src/app/http/admin"
+	am "go-ibooking/src/app/middleware/admin"
 
 	"github.com/gofiber/fiber/v2"
 )

@@ -1,8 +1,8 @@
 package registry
 
 import (
-	adminController "github.com/pudthaiiii/go-ibooking/src/app/http/admin/controllers/prototype"
-	adminService "github.com/pudthaiiii/go-ibooking/src/app/services/admin"
+	adminController "go-ibooking/src/app/http/admin/controllers/prototype"
+	adminService "go-ibooking/src/app/services/admin"
 )
 
 // apply service to controller

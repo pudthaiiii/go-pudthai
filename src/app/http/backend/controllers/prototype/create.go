@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	dtos "github.com/pudthaiiii/go-ibooking/src/app/http/admin/dtos/request/prototype"
-	"github.com/pudthaiiii/go-ibooking/src/app/validator"
+	dtos "go-ibooking/src/app/http/admin/dtos/request/prototype"
+	"go-ibooking/src/app/validator"
 
 	"github.com/gofiber/fiber/v2"
 )

@@ -8,13 +8,13 @@ import (
 	"github.com/gofiber/swagger"
 	"github.com/joho/godotenv"
 
-	adminRouter "github.com/pudthaiiii/go-ibooking/src/app/router/admin"
-	backendRouter "github.com/pudthaiiii/go-ibooking/src/app/router/backend"
+	adminRouter "go-ibooking/src/app/router/admin"
+	backendRouter "go-ibooking/src/app/router/backend"
 
-	_ "github.com/pudthaiiii/go-ibooking/docs"
-	"github.com/pudthaiiii/go-ibooking/src/pkg"
-	"github.com/pudthaiiii/go-ibooking/src/registry"
-	"github.com/pudthaiiii/go-ibooking/src/utils"
+	_ "go-ibooking/docs"
+	"go-ibooking/src/pkg"
+	"go-ibooking/src/registry"
+	"go-ibooking/src/utils"
 )
 
 type App struct {

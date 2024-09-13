@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	adminService "github.com/pudthaiiii/go-ibooking/src/app/services/admin"
+	adminService "go-ibooking/src/app/services/admin"
 
 	"github.com/gofiber/fiber/v2"
 )

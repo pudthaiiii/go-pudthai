@@ -8,7 +8,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/pudthaiiii/go-ibooking/src/utils"
+	"go-ibooking/src/utils"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"

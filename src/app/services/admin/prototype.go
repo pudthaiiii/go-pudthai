@@ -3,8 +3,8 @@ package services
 import (
 	"context"
 
-	dtos "github.com/pudthaiiii/go-ibooking/src/app/http/admin/dtos/response/prototype"
-	repo "github.com/pudthaiiii/go-ibooking/src/app/repository"
+	dtos "go-ibooking/src/app/http/admin/dtos/response/prototype"
+	repo "go-ibooking/src/app/repository"
 )
 
 type prototypeService struct {

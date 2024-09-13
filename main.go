@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"log"
 
+	"go-ibooking/src/cmd"
+	resource "go-ibooking/src/resource"
+
 	"github.com/gocraft/work"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gomodule/redigo/redis"
-	"github.com/pudthaiiii/go-ibooking/src/cmd"
-	resource "github.com/pudthaiiii/go-ibooking/src/resource"
 )
 
 var RedisPool *redis.Pool

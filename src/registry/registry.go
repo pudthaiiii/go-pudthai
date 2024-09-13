@@ -1,12 +1,13 @@
 package registry
 
 import (
-	"github.com/go-redis/redis/v8"
-	admin "github.com/pudthaiiii/go-ibooking/src/app/http/admin"
-	backend "github.com/pudthaiiii/go-ibooking/src/app/http/backend"
-	"github.com/pudthaiiii/go-ibooking/src/pkg"
+	admin "go-ibooking/src/app/http/admin"
+	backend "go-ibooking/src/app/http/backend"
+	"go-ibooking/src/pkg"
 
-	am "github.com/pudthaiiii/go-ibooking/src/app/middleware/admin"
+	"github.com/go-redis/redis/v8"
+
+	am "go-ibooking/src/app/middleware/admin"
 
 	"gorm.io/gorm"
 )
