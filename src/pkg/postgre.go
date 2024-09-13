@@ -19,6 +19,7 @@ func NewPgDatastore() *gorm.DB {
 	user := os.Getenv("DB_USERNAME")
 	password := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_DATABASE")
+	ssl := os.Getenv("DB_SSL")
 
 	u := url.URL{
 		Scheme: "postgres",
@@ -28,7 +29,7 @@ func NewPgDatastore() *gorm.DB {
 	}
 
 	query := u.Query()
-	query.Set("sslmode", "disable")
+	query.Set("sslmode", ssl)
 	u.RawQuery = query.Encode()
 
 	dsn := u.String()
