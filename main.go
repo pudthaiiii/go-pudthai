@@ -1,31 +1,28 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"go-ibooking/src/cmd"
 	resource "go-ibooking/src/resource"
 
-	"github.com/gocraft/work"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gomodule/redigo/redis"
 )
 
-var RedisPool *redis.Pool
-var Enqueuer *work.Enqueuer
+// var RedisPool *redis.Pool
+// var Enqueuer *work.Enqueuer
 
 func main() {
-	RedisPool = &redis.Pool{
-		MaxActive: 5,
-		MaxIdle:   5,
-		Wait:      true,
-		Dial: func() (redis.Conn, error) {
-			return redis.Dial("tcp", ":6379")
-		},
-	}
+	// RedisPool = &redis.Pool{
+	// 	MaxActive: 5,
+	// 	MaxIdle:   5,
+	// 	Wait:      true,
+	// 	Dial: func() (redis.Conn, error) {
+	// 		return redis.Dial("tcp", ":6379")
+	// 	},
+	// }
 
-	Enqueuer = work.NewEnqueuer("go-ibooking", RedisPool)
+	// Enqueuer = work.NewEnqueuer("go-ibooking", RedisPool)
 
 	app := initFiberRouter()
 
@@ -43,13 +40,13 @@ func initFiberRouter() *fiber.App {
 		ErrorHandler: resource.ErrorHandler,
 	})
 
-	_, err := Enqueuer.Enqueue("test_job", work.Q{"name": "send by init"})
-	if err != nil {
-		fmt.Println(err)
-	}
+	// _, err := Enqueuer.Enqueue("test_job", work.Q{"name": "send by init"})
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
 
-	// Import job queue routes
-	initJobQueueRoutes(app)
+	// // Import job queue routes
+	// initJobQueueRoutes(app)
 
 	return app
 }
