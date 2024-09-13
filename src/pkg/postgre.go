@@ -8,8 +8,6 @@ import (
 	"os"
 	"time"
 
-	"go-ibooking/src/utils"
-
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -64,7 +62,7 @@ type sqlLogger struct {
 }
 
 func (l sqlLogger) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
-	if utils.RequireEnv("DB_LOGGING", "false") == "false" {
+	if os.Getenv("DB_LOGGING") == "false" {
 		return
 	}
 

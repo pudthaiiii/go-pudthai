@@ -4,10 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
-
-	"go-ibooking/src/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -47,7 +46,7 @@ func ErrorHandler(c *fiber.Ctx, err error) error {
 			"code":    errorCode,
 		}
 
-		if boolTrue, _ := strconv.ParseBool(utils.RequireEnv("EXCEPTION_LOG_ENABLED", "false")); boolTrue && len(exception) != 0 {
+		if boolTrue, _ := strconv.ParseBool(os.Getenv("EXCEPTION_LOG_ENABLED")); boolTrue && len(exception) != 0 {
 			response["errors"] = exception
 		}
 

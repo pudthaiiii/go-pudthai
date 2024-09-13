@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
@@ -14,7 +15,6 @@ import (
 	_ "go-ibooking/docs"
 	"go-ibooking/src/pkg"
 	"go-ibooking/src/registry"
-	"go-ibooking/src/utils"
 )
 
 type App struct {
@@ -61,7 +61,7 @@ func (app *App) newRegistry() registry.Registry {
 }
 
 func (app *App) listen() {
-	port := utils.RequireEnv("PORT", "3000")
+	port := os.Getenv("PORT")
 
 	log.Printf("Server started on port %s", port)
 	if err := app.route.Listen(":" + port); err != nil {
