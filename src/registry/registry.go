@@ -1,7 +1,7 @@
 package registry
 
 import (
-	admin "go-ibooking/src/app/http/admin"
+	a "go-ibooking/src/app/http/admin"
 	backend "go-ibooking/src/app/http/backend"
 	"go-ibooking/src/pkg"
 
@@ -19,7 +19,7 @@ type registry struct {
 }
 
 type Registry interface {
-	NewAdminController() admin.AdminController
+	NewAdminController() a.AdminController
 	NewBackendController() backend.BackendController
 	NewAdminMiddleware() am.Middleware
 }
@@ -36,9 +36,10 @@ func NewRegistry(
 	}
 }
 
-func (r *registry) NewAdminController() admin.AdminController {
-	ac := admin.AdminController{
-		AdminPrototype: r.NewPrototypeController(),
+func (r *registry) NewAdminController() a.AdminController {
+	ac := a.AdminController{
+		PrototypeController: r.RegisterPrototypeController(),
+		RoleController:      r.RegisterRoleController(),
 
 		// add more controller here
 	}
@@ -48,7 +49,7 @@ func (r *registry) NewAdminController() admin.AdminController {
 
 func (r *registry) NewBackendController() backend.BackendController {
 	ac := backend.BackendController{
-		PrototypeController: r.NewPrototypeController(),
+		PrototypeController: r.RegisterPrototypeController(),
 
 		// add more controller here
 	}

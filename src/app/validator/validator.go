@@ -1,6 +1,7 @@
 package validator
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/go-playground/validator/v10"
@@ -41,13 +42,13 @@ func (v xValidator) inValidate(data interface{}) []errorResponse {
 	return validationErrors
 }
 
+// ฟังก์ชัน Validate
 func Validate[T any](c *fiber.Ctx, data *T) error {
 	myValidator := &xValidator{
 		validator: validate,
 	}
 
 	var err error
-
 	switch c.Method() {
 	case "GET":
 		err = c.QueryParser(data)
@@ -56,18 +57,12 @@ func Validate[T any](c *fiber.Ctx, data *T) error {
 	}
 
 	if err != nil {
-		errorMsg := "Cannot parse query parameters"
-
-		if c.Method() != "GET" {
-			errorMsg = "Cannot parse JSON"
-		}
-
-		return handleValidationError(c, errorMsg)
+		msg := fmt.Sprintf("%v", err)
+		return handleValidationError(c, msg) // ส่ง error กลับไปยัง Fiber
 	}
 
 	if errs := myValidator.inValidate(data); len(errs) > 0 && errs[0].Error {
 		errorMap := make(map[string][]string)
-
 		for _, err := range errs {
 			failedField := strcase.ToLowerCamel(err.FailedField)
 
@@ -79,24 +74,22 @@ func Validate[T any](c *fiber.Ctx, data *T) error {
 			errorMap[failedField] = append(errorMap[failedField], errorMsg)
 		}
 
-		return handleValidationError(c, errorMap)
+		return handleValidationError(c, errorMap) // ส่ง error กลับไปยัง Fiber
 	}
 
 	return nil
 }
 
-func handleValidationError(c *fiber.Ctx, errors interface{}) error {
+// ฟังก์ชัน handleValidationError คืน error
+func handleValidationError(_ *fiber.Ctx, errors interface{}) error {
 	response := map[string]interface{}{
-		"status": map[string]interface{}{
-			"code":    422,
-			"message": "Unprocessable Entity",
-		},
-		"error": map[string]interface{}{
-			"code":    100422,
-			"message": "VALIDATE_ERROR",
-			"errors":  errors,
-		},
+		"message": "VALIDATE_ERROR",
+		"errors":  errors,
 	}
 
-	return c.Status(fiber.StatusUnprocessableEntity).JSON(response)
+	jsonData, _ := json.Marshal(response)
+
+	jsonString := string(jsonData)
+	// คืนค่า error ที่ถูก format เพื่อให้ Fiber จัดการ
+	return fiber.NewError(fiber.StatusUnprocessableEntity, jsonString)
 }

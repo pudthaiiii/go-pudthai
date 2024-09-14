@@ -6,8 +6,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func (p prototypeController) Paginate(c *fiber.Ctx) error {
-	data, err := p.prototypeService.Paginate(c.Context())
+func (s roleController) Paginate(c *fiber.Ctx) error {
+	data, err := s.roleService.Paginate(c.Context())
 	if err != nil {
 		return err
 	}

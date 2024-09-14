@@ -1,22 +1,21 @@
 package controllers
 
 import (
-	adminService "go-ibooking/src/app/services/admin"
+	service "go-ibooking/src/app/services/admin"
 
 	"github.com/gofiber/fiber/v2"
 )
-
-type prototypeController struct {
-	prototypeService adminService.PrototypeService
-}
 
 type PrototypeController interface {
 	Paginate(c *fiber.Ctx) error
 	Create(c *fiber.Ctx) error
 }
 
-func NewPrototypeController(prototypeService adminService.PrototypeService) PrototypeController {
+type prototypeController struct {
+	prototypeService service.PrototypeService
+}
 
+func NewPrototypeController(prototypeService service.PrototypeService) PrototypeController {
 	return &prototypeController{
 		prototypeService,
 	}

@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
+	"go-ibooking/src/app/model"
 	log "go-ibooking/src/pkg/logger"
 )
 
@@ -50,6 +51,11 @@ func NewPgDatastore() *gorm.DB {
 		return nil
 	}
 
+	// AutoMigrate จะสร้างตารางที่คุณกำหนดในโมเดล
+	if err := db.AutoMigrate(&model.Merchant{}, &model.User{}, &model.Role{}); err != nil {
+		log.Log.Err(err).Msg("Migration failed")
+	}
+
 	sqlDB.SetConnMaxIdleTime(10)
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetMaxIdleConns(10)
@@ -68,5 +74,5 @@ func (l sqlLogger) Trace(ctx context.Context, begin time.Time, fc func() (string
 	}
 
 	sql, _ := fc()
-	log.Log.Printf("SQL: %s\n==============================================================================\n", sql)
+	log.Write.Printf("SQL: %s\n==============================================================================\n", sql)
 }

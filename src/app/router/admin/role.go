@@ -1,25 +1,25 @@
 package route
 
 import (
-	controller "go-ibooking/src/app/http/admin/controllers/prototype"
+	controller "go-ibooking/src/app/http/admin/controllers/role"
 	"go-ibooking/src/types"
 )
 
-func addPrototypeRoute(c controller.PrototypeController) types.Routes {
+func addRoleRoute(c controller.RoleController) types.Routes {
 	return types.Routes{
 		types.Route{
 			Name:        "Paginate",
 			Method:      "GET",
-			Pattern:     "/prototype",
+			Pattern:     "/roles",
 			Operation:   "",
 			Resource:    "",
 			HandlerFunc: c.Paginate,
 		},
 
 		types.Route{
-			Name:        "Paginate",
+			Name:        "Create",
 			Method:      "POST",
-			Pattern:     "/prototype",
+			Pattern:     "/role",
 			Operation:   "",
 			Resource:    "",
 			HandlerFunc: c.Create,

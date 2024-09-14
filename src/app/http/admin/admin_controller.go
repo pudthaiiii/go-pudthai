@@ -1,9 +1,11 @@
 package controllers
 
 import (
-	a "go-ibooking/src/app/http/admin/controllers/prototype"
+	prototype "go-ibooking/src/app/http/admin/controllers/prototype"
+	role "go-ibooking/src/app/http/admin/controllers/role"
 )
 
 type AdminController struct {
-	AdminPrototype a.PrototypeController
+	prototype.PrototypeController
+	role.RoleController
 }

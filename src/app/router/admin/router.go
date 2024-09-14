@@ -8,12 +8,12 @@ import (
 )
 
 func InitializeAdminRoute(app *fiber.App, c controller.AdminController, m am.Middleware) *fiber.App {
-	routes := addPrototypeRoute(c.AdminPrototype)
+	routes := addPrototypeRoute(c.PrototypeController)
 
-	// routes := append(
-	// 	addPrototypeRoute(c.BackendPrototype),
-	// 	// add route here
-	// )
+	routes = append(
+		addRoleRoute(c.RoleController),
+		// add route here
+	)
 
 	prefix := app.Group("/v1/admin")
 

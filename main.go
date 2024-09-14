@@ -1,9 +1,11 @@
 package main
 
 import (
-	"go-ibooking/src/cmd"
+	ApiResource "go-ibooking/src/app/resources"
+
 	log "go-ibooking/src/pkg/logger"
-	resource "go-ibooking/src/resource"
+
+	"go-ibooking/src/cmd"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -23,7 +25,7 @@ func main() {
 
 func initFiberRouter() *fiber.App {
 	app := fiber.New(fiber.Config{
-		ErrorHandler: resource.ErrorHandler,
+		ErrorHandler: ApiResource.ErrorHandler,
 	})
 
 	return app
