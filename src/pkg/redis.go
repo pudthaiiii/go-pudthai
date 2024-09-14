@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"go-ibooking/src/pkg/logger"
 	"go-ibooking/src/utils"
 
 	"github.com/go-redis/redis/v8"
@@ -59,10 +60,11 @@ func connectRedisStandalone() *redis.Client {
 
 	_, err := client.Ping(ctx).Result()
 	if err != nil {
+		logger.Log.Err(err).Msg("failed to connect to Redis (Standalone)")
 		log.Printf("Failed to connect to Redis (Standalone): %v", err)
 	}
 
-	log.Printf("Successfully connected to Redis (Standalone), DB: %s", db)
+	logger.Write.Info().Msg("Successfully connected to Redis (Standalone)")
 	return client
 }
 
@@ -83,9 +85,10 @@ func connectRedisCluster() *redis.ClusterClient {
 
 	_, err := client.Ping(ctx).Result()
 	if err != nil {
+		logger.Log.Err(err).Msg("failed to connect to Redis Cluster")
 		log.Printf("Failed to connect to Redis Cluster: %v", err)
 	}
 
-	log.Printf("Successfully connected to Redis Cluster")
+	logger.Write.Info().Msg("Successfully connected to Redis Cluster")
 	return client
 }

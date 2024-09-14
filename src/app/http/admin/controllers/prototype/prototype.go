@@ -16,6 +16,7 @@ type PrototypeController interface {
 }
 
 func NewPrototypeController(prototypeService adminService.PrototypeService) PrototypeController {
+
 	return &prototypeController{
 		prototypeService,
 	}

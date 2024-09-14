@@ -3,6 +3,7 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
+	"go-ibooking/src/pkg/logger"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -28,12 +29,14 @@ func (r *RecaptchaProvider) VerifyToken(token string) (bool, error) {
 	)
 
 	if err != nil {
+		logger.Log.Err(err).Msg("failed to verify reCAPTCHA token")
 		return false, fmt.Errorf("failed to verify reCAPTCHA token: %w", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
+		logger.Log.Err(err).Msg("failed to read reCAPTCHA response body")
 		return false, fmt.Errorf("failed to read reCAPTCHA response body: %w", err)
 	}
 
@@ -42,6 +45,7 @@ func (r *RecaptchaProvider) VerifyToken(token string) (bool, error) {
 	}
 
 	if err := json.Unmarshal(body, &result); err != nil {
+		logger.Log.Err(err).Msg("failed to unmarshal reCAPTCHA response")
 		return false, fmt.Errorf("failed to unmarshal reCAPTCHA response: %w", err)
 	}
 

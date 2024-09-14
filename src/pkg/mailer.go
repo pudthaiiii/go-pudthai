@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
+	"go-ibooking/src/pkg/logger"
 	"html/template"
 	"net/smtp"
 	"os"
@@ -49,6 +50,7 @@ func (e *emailClient) renderTemplate(templateFile string, data map[string]interf
 func (e *emailClient) SendEmail(subject, templateFile string, data map[string]interface{}, toEmail string, bccEmails ...string) error {
 	body, err := e.renderTemplate(templateFile, data)
 	if err != nil {
+		logger.Log.Err(err).Msg("failed to render template")
 		return fmt.Errorf("failed to render template: %w", err)
 	}
 
@@ -70,6 +72,7 @@ func (e *emailClient) SendEmail(subject, templateFile string, data map[string]in
 
 	err = send(auth, recipients, msg)
 	if err != nil {
+		logger.Log.Err(err).Msg("failed to send email")
 		return fmt.Errorf("failed to send email: %w", err)
 	}
 
@@ -80,6 +83,7 @@ func formatBCC(bccEmails []string) string {
 	if len(bccEmails) == 0 {
 		return ""
 	}
+
 	return fmt.Sprintf("%s", bccEmails)
 }
 
@@ -110,44 +114,52 @@ func (e *emailClient) sendEmailTLS(auth smtp.Auth, recipients []string, msg []by
 
 	conn, err := tls.Dial("tcp", e.smtpServer+":"+e.smtpPort, tlsConfig)
 	if err != nil {
+		logger.Log.Err(err).Msg("failed to dial TLS connection")
 		return fmt.Errorf("failed to dial TLS connection: %w", err)
 	}
 
 	client, err := smtp.NewClient(conn, e.smtpServer)
 	if err != nil {
+		logger.Log.Err(err).Msg("failed to create SMTP client")
 		return fmt.Errorf("failed to create SMTP client: %w", err)
 	}
 
 	defer client.Quit()
 	err = client.Auth(auth)
 	if err != nil {
+		logger.Log.Err(err).Msg("failed to authenticate")
 		return fmt.Errorf("failed to authenticate: %w", err)
 	}
 
 	err = client.Mail(e.fromAddress)
 	if err != nil {
+		logger.Log.Err(err).Msg("failed to set sender address")
 		return fmt.Errorf("failed to set sender address: %w", err)
 	}
 
 	for _, recipient := range recipients {
 		err = client.Rcpt(recipient)
 		if err != nil {
+			logger.Log.Err(err).Msg("failed to add recipient")
 			return fmt.Errorf("failed to add recipient: %w", err)
 		}
 	}
 
 	w, err := client.Data()
 	if err != nil {
+		logger.Log.Err(err).Msg("failed to create data writer")
 		return fmt.Errorf("failed to create data writer: %w", err)
 	}
 
 	_, err = w.Write(msg)
 	if err != nil {
+		logger.Log.Err(err).Msg("failed to write message")
 		return fmt.Errorf("failed to write message: %w", err)
 	}
 
 	err = w.Close()
 	if err != nil {
+		logger.Log.Err(err).Msg("failed to close data writer")
 		return fmt.Errorf("failed to close data writer: %w", err)
 	}
 

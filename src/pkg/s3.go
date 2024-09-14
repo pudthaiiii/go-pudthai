@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"go-ibooking/src/pkg/logger"
 	"io"
-	"log"
 	"os"
 	"time"
 
@@ -35,7 +35,7 @@ func NewS3Datastore() *S3Datastore {
 	)
 
 	if err != nil {
-		log.Printf("unable to load SDK config, %v", err)
+		logger.Log.Err(err).Msg("unable to load SDK config")
 	}
 
 	client := s3.NewFromConfig(cfg)
@@ -46,12 +46,12 @@ func NewS3Datastore() *S3Datastore {
 	}
 }
 
-func (s *S3Datastore) CheckConnection(ctx context.Context) error {
+func (s *S3Datastore) CheckConnection() error {
 	input := &s3.HeadBucketInput{
 		Bucket: &s.Bucket,
 	}
 
-	_, err := s.client.HeadBucket(ctx, input)
+	_, err := s.client.HeadBucket(context.Background(), input)
 	if err != nil {
 		return err
 	}
@@ -68,6 +68,7 @@ func (s *S3Datastore) GenerateSignedURL(key string, expiresIn time.Duration) (st
 	}, s3.WithPresignExpires(expiresIn))
 
 	if err != nil {
+		logger.Log.Err(err).Msg("failed to sign request")
 		return "", fmt.Errorf("failed to sign request: %w", err)
 	}
 
@@ -86,6 +87,7 @@ func (s *S3Datastore) UploadFile(ctx context.Context, key string, body []byte) (
 
 	result, err := s.client.PutObject(ctx, input)
 	if err != nil {
+		logger.Log.Err(err).Msg("failed to upload file")
 		return nil, err
 	}
 
@@ -100,12 +102,14 @@ func (s *S3Datastore) GetFile(ctx context.Context, key string) ([]byte, error) {
 
 	result, err := s.client.GetObject(ctx, input)
 	if err != nil {
+		logger.Log.Err(err).Msg("failed to get file")
 		return nil, err
 	}
 	defer result.Body.Close()
 
 	body, err := io.ReadAll(result.Body)
 	if err != nil {
+		logger.Log.Err(err).Msg("failed to read file")
 		return nil, err
 	}
 

@@ -1,9 +1,8 @@
-package pkg
+package logger
 
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
 	"time"
 
@@ -12,20 +11,21 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/types"
+	"github.com/rs/zerolog/log"
 )
 
-type CloudWatchLogsDatastore struct {
-	Client        *cloudwatchlogs.Client
+type cloudWatchLogger struct {
+	client        *cloudwatchlogs.Client
 	LogGroupName  string
 	LogStreamName string
 }
 
-func NewCloudWatchLogsDatastore() *CloudWatchLogsDatastore {
+func NewCloudWatchLogger() (*cloudWatchLogger, error) {
 	accessKeyID := os.Getenv("AWS_CLOUDWATCH_ACCESS_KEY_ID")
 	secretAccessKey := os.Getenv("AWS_CLOUDWATCH_SECRET_ACCESS_KEY")
 	region := os.Getenv("AWS_CLOUDWATCH_REGION")
-	logGroupName := os.Getenv("AWS_CLOUDWATCH_LOG_GROUP_NAME")
-	logStreamName := os.Getenv("AWS_CLOUDWATCH_LOG_STREAM_NAME")
+	groupName := os.Getenv("AWS_CLOUDWATCH_LOG_GROUP_NAME")
+	streamName := os.Getenv("AWS_CLOUDWATCH_LOG_STREAM_NAME")
 
 	creds := credentials.NewStaticCredentialsProvider(accessKeyID, secretAccessKey, "")
 
@@ -36,35 +36,44 @@ func NewCloudWatchLogsDatastore() *CloudWatchLogsDatastore {
 
 	if err != nil {
 		log.Printf("unable to load SDK config, %v", err)
+		return nil, err
 	}
 
 	client := cloudwatchlogs.NewFromConfig(cfg)
 
-	return &CloudWatchLogsDatastore{
-		Client:        client,
-		LogGroupName:  logGroupName,
-		LogStreamName: logStreamName,
-	}
+	return &cloudWatchLogger{
+		client:        client,
+		LogGroupName:  groupName,
+		LogStreamName: streamName,
+	}, nil
 }
 
-func (cw *CloudWatchLogsDatastore) PutLogEvent(ctx context.Context, message string) error {
-	describeStreamsOutput, err := cw.Client.DescribeLogStreams(ctx, &cloudwatchlogs.DescribeLogStreamsInput{
+func (cw *cloudWatchLogger) Write(p []byte) (n int, err error) {
+	message := string(p)
+
+	cw.putLogEvent(message)
+	return len(p), nil
+}
+
+func (cw *cloudWatchLogger) putLogEvent(message string) {
+	describeStreamsOutput, err := cw.client.DescribeLogStreams(context.Background(), &cloudwatchlogs.DescribeLogStreamsInput{
 		LogGroupName:        &cw.LogGroupName,
 		LogStreamNamePrefix: &cw.LogStreamName,
 	})
 
 	if err != nil {
-		return fmt.Errorf("failed to describe log streams: %w", err)
+		log.Error().Err(err).Msg("Failed to send log to CloudWatch")
 	}
 
 	if len(describeStreamsOutput.LogStreams) == 0 {
-		return fmt.Errorf("log stream %s not found", cw.LogStreamName)
+		msg := fmt.Sprintf("log stream %s not found", cw.LogStreamName)
+		log.Error().Msg(msg)
 	}
 
 	sequenceToken := describeStreamsOutput.LogStreams[0].UploadSequenceToken
-
 	timestamp := time.Now().UnixMilli()
-	_, err = cw.Client.PutLogEvents(ctx, &cloudwatchlogs.PutLogEventsInput{
+
+	_, err = cw.client.PutLogEvents(context.Background(), &cloudwatchlogs.PutLogEventsInput{
 		LogEvents: []types.InputLogEvent{
 			{
 				Message:   aws.String(message),
@@ -77,8 +86,7 @@ func (cw *CloudWatchLogsDatastore) PutLogEvent(ctx context.Context, message stri
 	})
 
 	if err != nil {
-		return fmt.Errorf("failed to put log event: %w", err)
+		msg := fmt.Sprintf("failed to put log event: %s", err)
+		log.Error().Err(err).Msg(msg)
 	}
-
-	return nil
 }

@@ -26,13 +26,13 @@ type Registry interface {
 
 func NewRegistry(
 	db *gorm.DB,
-	// redisClient redis.UniversalClient,
+	redisClient redis.UniversalClient,
 	s3 *pkg.S3Datastore,
 ) Registry {
 	return &registry{
-		db: db,
-		// redis: redisClient,
-		s3: s3,
+		db:    db,
+		redis: redisClient,
+		s3:    s3,
 	}
 }
 

@@ -3,7 +3,6 @@ package pkg
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/url"
 	"os"
 	"time"
@@ -11,6 +10,8 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
+
+	log "go-ibooking/src/pkg/logger"
 )
 
 func NewPgDatastore() *gorm.DB {
@@ -39,13 +40,13 @@ func NewPgDatastore() *gorm.DB {
 	})
 
 	if err != nil {
-		log.Printf("failed to connect to PostgreSQL: %v", err)
+		log.Log.Err(err).Msg("failed to connect to PostgreSQL")
 		return nil
 	}
 
 	sqlDB, err := db.DB()
 	if err != nil {
-		log.Printf("failed to get SQL database instance: %v", err)
+		log.Log.Err(err).Msg("failed to get SQL database instance")
 		return nil
 	}
 
@@ -53,8 +54,7 @@ func NewPgDatastore() *gorm.DB {
 	sqlDB.SetMaxOpenConns(100)
 	sqlDB.SetMaxIdleConns(10)
 
-	log.Println("Successfully connected to PostgreSQL")
-
+	log.Write.Info().Msg("Successfully connected to PostgreSQL")
 	return db
 }
 
@@ -68,5 +68,5 @@ func (l sqlLogger) Trace(ctx context.Context, begin time.Time, fc func() (string
 	}
 
 	sql, _ := fc()
-	log.Printf("SQL: %s\n==============================================================================\n", sql)
+	log.Log.Printf("SQL: %s\n==============================================================================\n", sql)
 }

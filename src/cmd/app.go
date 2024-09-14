@@ -2,18 +2,18 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
 	"github.com/joho/godotenv"
 
+	_ "go-ibooking/docs"
+
 	adminRouter "go-ibooking/src/app/router/admin"
 	backendRouter "go-ibooking/src/app/router/backend"
-
-	_ "go-ibooking/docs"
 	"go-ibooking/src/pkg"
+	"go-ibooking/src/pkg/logger"
 	"go-ibooking/src/registry"
 )
 
@@ -40,6 +40,8 @@ func (app *App) setup() {
 	// apply registry
 	r := app.newRegistry()
 
+	logger.Write.Info().Msg("Successfully connected to Kafka")
+
 	// apply router
 	adminRouter.InitializeAdminRoute(app.route, r.NewAdminController(), r.NewAdminMiddleware())
 	backendRouter.InitializeBackendRoute(app.route, r.NewBackendController(), r.NewAdminMiddleware())
@@ -54,23 +56,21 @@ func (app *App) newMiddleware() {
 
 func (app *App) newRegistry() registry.Registry {
 	db := pkg.NewPgDatastore()
-	// redis := pkg.NewRedisDatastore()
+	redis := pkg.NewRedisDatastore()
 	s3 := pkg.NewS3Datastore()
 
-	return registry.NewRegistry(db, s3)
+	return registry.NewRegistry(db, redis.Client, s3)
 }
 
 func (app *App) listen() {
 	port := os.Getenv("PORT")
 
-	log.Printf("Server started on port %s", port)
+	logger.Write.Info().Msg(fmt.Sprintf("Server started on port %s", port))
 	if err := app.route.Listen(":" + port); err != nil {
-		log.Printf("Server failed to start: %v", err)
+		logger.Write.Err(err).Msg("Server failed to start")
 	}
 }
 
 func InitializeEnv() {
-	if err := godotenv.Load(); err != nil {
-		log.Printf("No .env file found")
-	}
+	godotenv.Load()
 }
