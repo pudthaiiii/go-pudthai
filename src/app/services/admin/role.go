@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"fmt"
 
 	"go-ibooking/src/app/model"
 	"go-ibooking/src/pkg/logger"
@@ -14,8 +13,8 @@ import (
 )
 
 type RoleService interface {
-	Paginate(ctx context.Context) ([]model.Role, error)
-	Create(ctx context.Context, req req.RoleCreateRequest) (res.CreateRoleResponse, error)
+	Paginate(ctx context.Context) ([]res.RolePaginateResponse, error)
+	Create(ctx context.Context, dtoReq req.RoleCreateRequest) (res.CreateRoleResponse, error)
 }
 
 type roleService struct {
@@ -28,20 +27,20 @@ func NewRoleService(roleRepo *gorm.DB) RoleService {
 	}
 }
 
-func (s *roleService) Create(ctx context.Context, req req.RoleCreateRequest) (res.CreateRoleResponse, error) {
+func (s *roleService) Create(ctx context.Context, dtoReq req.RoleCreateRequest) (res.CreateRoleResponse, error) {
 	response := res.CreateRoleResponse{}
 
 	role := model.Role{
-		Name:             req.Name,
-		IsCorporateAdmin: req.IsCorporateAdmin,
-		IsActive:         req.IsActive,
+		Name:             dtoReq.Name,
+		IsCorporateAdmin: dtoReq.IsCorporateAdmin,
+		IsActive:         dtoReq.IsActive,
 		MerchantID:       1,
 	}
 
-	result := s.roleRepo.Create(&role)
-	if result.Error != nil {
-		logger.Log.Err(result.Error).Msg("Failed to create roles")
-		return response, result.Error
+	queryBuilder1 := s.roleRepo.Create(&role)
+	if queryBuilder1.Error != nil {
+		logger.Log.Err(queryBuilder1.Error).Msg("Failed to create roles")
+		return response, queryBuilder1.Error
 	}
 
 	response = res.CreateRoleResponse{
@@ -51,30 +50,35 @@ func (s *roleService) Create(ctx context.Context, req req.RoleCreateRequest) (re
 	return response, nil
 }
 
-func (s *roleService) Paginate(ctx context.Context) ([]model.Role, error) {
-	var response []model.Role
+func (s *roleService) Paginate(ctx context.Context) ([]res.RolePaginateResponse, error) {
+	roles := []model.Role{}
+	response := []res.RolePaginateResponse{}
 
-	var totalCount int64 = 0
+	queryBuilder := s.roleRepo.
+		Find(&roles)
 
-	// Get total count
-	err := s.roleRepo.Model(&model.Role{}).Count(&totalCount).Error
-	if err != nil {
-		return nil, err
+	if queryBuilder.Error != nil {
+		logger.Log.Err(queryBuilder.Error).Msg("Failed to fetch roles")
+		return response, queryBuilder.Error
 	}
 
-	// Get paginated results
-	err = s.roleRepo.
-		Preload("Merchant", func(db *gorm.DB) *gorm.DB {
-			return db.Select("id, uuid, name")
-		}).
-		Limit(10).
-		Offset(0).
-		Find(&response).Error
-
-	if err != nil {
-		return nil, err
+	for _, role := range roles {
+		response = append(response, res.RolePaginateResponse{
+			ID:               role.ID,
+			Uuid:             role.Uuid,
+			Name:             role.Name,
+			IsActive:         role.IsActive,
+			IsCorporateAdmin: role.IsCorporateAdmin,
+			MerchantID:       role.MerchantID,
+			CreatedAt:        role.CreatedAt.Format("2006-01-02 15:04:05"),
+			UpdatedAt:        role.UpdatedAt.Format("2006-01-02 15:04:05"),
+			Merchant: res.RoleMerchant{
+				ID:   role.Merchant.ID,
+				Name: role.Merchant.Name,
+				Uuid: role.Merchant.Uuid,
+			},
+		})
 	}
 
-	fmt.Println("Total count: ", totalCount)
 	return response, nil
 }

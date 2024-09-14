@@ -54,9 +54,9 @@ func ErrorHandler(c *fiber.Ctx, err error) error {
 			errorCode = http.StatusMethodNotAllowed
 			errorMessage = "405 Method Not Allowed"
 
-		case strings.Contains(err.Error(), "violates foreign key constraint"):
+		case strings.Contains(err.Error(), "SQLSTATE"):
 			errorCode = http.StatusBadRequest
-			errorMessage = "Foreign Key Constraint Violation"
+			errorMessage = "GORM ERROR"
 			exception = append(exception, err.Error())
 		}
 	}
