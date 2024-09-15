@@ -1,7 +1,6 @@
 package services
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"mime/multipart"
@@ -18,13 +17,13 @@ import (
 	"go-ibooking/src/app/model"
 )
 
-type UsersService interface {
-	Create(ctx context.Context, dto dtoReq.CreateRequest, avatar *multipart.FileHeader) (dtoRes.CreateResponse, error)
-}
-
 type usersService struct {
 	usersRepo *gorm.DB
 	s3        *pkg.S3Datastore
+}
+
+type UsersService interface {
+	Create(dto dtoReq.CreateRequest, avatar *multipart.FileHeader) (dtoRes.CreateResponse, error)
 }
 
 func NewUsersService(usersRepo *gorm.DB, s3 *pkg.S3Datastore) UsersService {
@@ -35,7 +34,7 @@ func NewUsersService(usersRepo *gorm.DB, s3 *pkg.S3Datastore) UsersService {
 }
 
 // Create new user
-func (s *usersService) Create(ctx context.Context, dto dtoReq.CreateRequest, avatar *multipart.FileHeader) (dtoRes.CreateResponse, error) {
+func (s *usersService) Create(dto dtoReq.CreateRequest, avatar *multipart.FileHeader) (dtoRes.CreateResponse, error) {
 	fileName := ""
 	response := dtoRes.CreateResponse{}
 

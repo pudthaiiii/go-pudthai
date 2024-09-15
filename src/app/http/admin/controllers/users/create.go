@@ -17,7 +17,7 @@ func (s usersController) Create(c *fiber.Ctx) error {
 		return errValidate
 	}
 
-	result, err := s.usersService.Create(c.Context(), req, file)
+	result, err := s.usersService.Create(req, file)
 	if err != nil {
 		return err
 	}
