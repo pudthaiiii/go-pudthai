@@ -1,6 +1,10 @@
 package ApiResource
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"fmt"
+
+	"github.com/gofiber/fiber/v2"
+)
 
 type Status struct {
 	Code    int    `json:"code"`
@@ -14,12 +18,21 @@ type successResponse struct {
 }
 
 func SuccessResponse(c *fiber.Ctx, data, pagination interface{}) error {
-	return c.JSON(successResponse{
-		Status: Status{
-			Code:    fiber.StatusOK,
-			Message: "OK",
-		},
-		Data:       data,
-		Pagination: pagination,
-	})
+	statusCode := fiber.StatusOK
+
+	if c.Route().Name == "Create" {
+		fmt.Println("Create")
+		statusCode = fiber.StatusCreated
+	}
+
+	return c.
+		Status(statusCode).
+		JSON(successResponse{
+			Status: Status{
+				Code:    statusCode,
+				Message: "OK",
+			},
+			Data:       data,
+			Pagination: pagination,
+		})
 }

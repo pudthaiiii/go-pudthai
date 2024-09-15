@@ -24,6 +24,7 @@ func InitializeAdminRoute(app *fiber.App, c controller.AdminController, m am.Mid
 		handler = m.Authenticate(handler)
 
 		prefix.Add(route.Method, route.Pattern, handler)
+		prefix.Name(route.Name)
 	}
 
 	return app
