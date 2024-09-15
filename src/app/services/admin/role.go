@@ -5,7 +5,6 @@ import (
 
 	"go-ibooking/src/app/model"
 	"go-ibooking/src/app/model/scopes"
-	"go-ibooking/src/pkg/logger"
 	"go-ibooking/src/utils"
 
 	"gorm.io/gorm"
@@ -45,8 +44,7 @@ func (s *roleService) Create(ctx context.Context, dto dtoReq.RoleCreateRequest) 
 
 	queryBuilder1 := s.roleRepo.Create(&role)
 	if queryBuilder1.Error != nil {
-		logger.Log.Err(queryBuilder1.Error).Msg("Failed to create roles")
-		return response, queryBuilder1.Error
+		return response, throw.Error(910101, queryBuilder1.Error)
 	}
 
 	response = dtoRes.CreateRoleResponse{
@@ -59,7 +57,6 @@ func (s *roleService) Create(ctx context.Context, dto dtoReq.RoleCreateRequest) 
 func (s *roleService) Paginate(ctx context.Context, params req.PaginateRequest) (result []dtoRes.RolePaginateResponse, paginate res.Pagination, err error) {
 	var totalRecord int64
 	roles := []model.Role{}
-
 	keySearch := []string{"name", "description"}
 
 	countBuilder := s.roleRepo.

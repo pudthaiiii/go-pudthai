@@ -16,8 +16,9 @@ var ErrorCodes = map[int]string{
 	910003: "UPLOADER_ERROR",
 
 	// Roles
-	910101: "ROLE_ERROR",
-	910102: "ROLE_NOT_FOUND",
+	910101: "ROLE_CREATE_ERROR",
+	910102: "ROLE_PAGINATION_ERROR",
+	910103: "ROLE_NOT_FOUND",
 }
 
 func Error(code int, err error) error {
