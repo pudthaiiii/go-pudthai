@@ -10,7 +10,7 @@ import (
 )
 
 func (s usersController) Create(c *fiber.Ctx) error {
-	req := dtos.CreateRequest{}
+	req := dtos.Create{}
 	file, _ := c.FormFile("avatar")
 
 	if errValidate := validator.Validate(c, &req); errValidate != nil {

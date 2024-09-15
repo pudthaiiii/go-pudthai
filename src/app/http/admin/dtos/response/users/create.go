@@ -1,5 +1,5 @@
 package dtos
 
-type CreateResponse struct {
+type Create struct {
 	ID uint `json:"id"`
 }

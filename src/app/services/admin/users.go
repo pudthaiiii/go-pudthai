@@ -23,7 +23,7 @@ type usersService struct {
 }
 
 type UsersService interface {
-	Create(dto dtoReq.CreateRequest, avatar *multipart.FileHeader) (dtoRes.CreateResponse, error)
+	Create(dto dtoReq.Create, avatar *multipart.FileHeader) (dtoRes.Create, error)
 }
 
 func NewUsersService(usersRepo *gorm.DB, s3 *pkg.S3Datastore) UsersService {
@@ -34,9 +34,9 @@ func NewUsersService(usersRepo *gorm.DB, s3 *pkg.S3Datastore) UsersService {
 }
 
 // Create new user
-func (s *usersService) Create(dto dtoReq.CreateRequest, avatar *multipart.FileHeader) (dtoRes.CreateResponse, error) {
+func (s *usersService) Create(dto dtoReq.Create, file *multipart.FileHeader) (dtoRes.Create, error) {
 	fileName := ""
-	response := dtoRes.CreateResponse{}
+	response := dtoRes.Create{}
 
 	// check existing user
 	existingErr := s.existingUserByEmail(dto.Email)
@@ -45,13 +45,13 @@ func (s *usersService) Create(dto dtoReq.CreateRequest, avatar *multipart.FileHe
 	}
 
 	// upload avatar
-	if avatar != nil {
+	if file != nil {
 		avatarName := uuid.New()
 		fileName = fmt.Sprintf("users/%s%s", avatarName.String(), ".jpg")
 
-		_, err := s.s3.ValidateAndUpload(avatar, fileName)
+		_, err := s.s3.ValidateAndUpload(file, fileName)
 		if err != nil {
-			return response, err
+			return response, throw.Error(910201, err)
 		}
 	}
 
@@ -80,7 +80,7 @@ func (s *usersService) Create(dto dtoReq.CreateRequest, avatar *multipart.FileHe
 	}
 
 	// response
-	response = dtoRes.CreateResponse{
+	response = dtoRes.Create{
 		ID: user.ID,
 	}
 
