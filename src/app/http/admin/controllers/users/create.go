@@ -23,5 +23,4 @@ func (s usersController) Create(c *fiber.Ctx) error {
 	}
 
 	return ApiResource.SuccessResponse(c, result, nil)
-
 }

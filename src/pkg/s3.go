@@ -129,8 +129,7 @@ func (s *S3Datastore) UploadFile(ctx context.Context, key string, body []byte) (
 
 	result, err := s.client.PutObject(ctx, input)
 	if err != nil {
-		logger.Log.Err(err).Msg("failed to upload file")
-		return nil, err
+		return nil, throw.Error(910003, fmt.Errorf("failed to upload file"))
 	}
 
 	return result, nil
