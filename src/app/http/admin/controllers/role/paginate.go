@@ -1,16 +1,24 @@
 package controllers
 
 import (
+	dtos "go-ibooking/src/app/http/admin/dtos/request"
 	ApiResource "go-ibooking/src/app/resources"
+	"go-ibooking/src/app/validator"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func (s roleController) Paginate(c *fiber.Ctx) error {
-	data, err := s.roleService.Paginate(c.Context())
+	params := dtos.PaginateRequest{}
+
+	if errValidate := validator.Validate(c, &params); errValidate != nil {
+		return errValidate
+	}
+
+	result, paginate, err := s.roleService.Paginate(c.Context(), params)
 	if err != nil {
 		return err
 	}
 
-	return ApiResource.SuccessResponse(c, data, nil, nil)
+	return ApiResource.SuccessResponse(c, result, paginate)
 }

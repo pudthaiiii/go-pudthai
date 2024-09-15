@@ -3,6 +3,7 @@ package ApiResource
 import (
 	"encoding/json"
 	"errors"
+	"go-ibooking/src/utils"
 	"net/http"
 	"os"
 	"strconv"
@@ -17,19 +18,22 @@ type validationError struct {
 }
 
 func ErrorHandler(c *fiber.Ctx, err error) error {
-	errorCode := http.StatusInternalServerError
+	statusCode := http.StatusInternalServerError
+	errorCode := 0
 	errorMessage := "Internal Server Error"
 	var exception []string
 
 	var e *fiber.Error
 
 	if errors.As(err, &e) {
+		statusCode = e.Code
 		errorCode = e.Code
 		errorMessage = e.Message
 
 		if strings.Contains(e.Error(), "VALIDATE_ERROR") {
-			errorCode = http.StatusUnprocessableEntity
-			errorMessage = "Validation Failed"
+			statusCode = http.StatusUnprocessableEntity
+			errorCode = 900422
+			errorMessage = "VALIDATE_ERROR"
 
 			var validationError validationError
 			json.Unmarshal([]byte(e.Error()), &validationError)
@@ -39,25 +43,21 @@ func ErrorHandler(c *fiber.Ctx, err error) error {
 			}
 		}
 	} else if err != nil {
-		switch {
-		case strings.Contains(err.Error(), `does not exist`):
-			errorCode = http.StatusInternalServerError
-			errorMessage = "Something went wrong"
-			exception = append(exception, err.Error())
+		throwException := utils.FilterThrowExceptions(err.Error())
 
-		case strings.Contains(err.Error(), "Cannot GET"):
-			errorCode = http.StatusNotFound
-			errorMessage = "404 Not Found"
+		if len(throwException) > 0 {
+			statusCode = http.StatusUnprocessableEntity
+			if len(throwException) > 1 && throwException[1] != "" {
+				errorCode, _ = strconv.Atoi(throwException[1])
+			}
 
-		case strings.Contains(err.Error(), "Cannot POST"), strings.Contains(err.Error(), "Cannot DELETE"),
-			strings.Contains(err.Error(), "Cannot PATCH"), strings.Contains(err.Error(), "Cannot PUT"):
-			errorCode = http.StatusMethodNotAllowed
-			errorMessage = "405 Method Not Allowed"
+			if len(throwException) > 2 && throwException[2] != "" {
+				errorMessage = throwException[2]
+			}
 
-		case strings.Contains(err.Error(), "SQLSTATE"):
-			errorCode = http.StatusBadRequest
-			errorMessage = "GORM ERROR"
-			exception = append(exception, err.Error())
+			if len(throwException) > 3 && throwException[3] != "" {
+				exception = append(exception, throwException[3])
+			}
 		}
 	}
 
@@ -70,5 +70,5 @@ func ErrorHandler(c *fiber.Ctx, err error) error {
 		response["errors"] = exception
 	}
 
-	return c.Status(errorCode).JSON(response)
+	return c.Status(statusCode).JSON(response)
 }

@@ -3,6 +3,8 @@ package registry
 import (
 	"go-ibooking/src/app/model"
 	a "go-ibooking/src/app/services/admin"
+
+	"gorm.io/gorm"
 )
 
 // NewPrototypeService
@@ -15,6 +17,6 @@ func (r *registry) RegisterPrototypeService() a.PrototypeService {
 
 func (r *registry) RegisterRoleService() a.RoleService {
 	return a.NewRoleService(
-		r.db.Model(&model.Role{}),
+		r.db.Model(&model.Role{}).Session(&gorm.Session{NewDB: true}),
 	)
 }

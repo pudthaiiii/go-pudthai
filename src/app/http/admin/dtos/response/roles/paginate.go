@@ -6,6 +6,7 @@ type RolePaginateResponse struct {
 	ID               uint      `json:"id"`
 	Uuid             uuid.UUID `json:"uuid"`
 	Name             string    `json:"name"`
+	Description      string    `json:"description"`
 	IsActive         int       `json:"isActive"`
 	IsCorporateAdmin int       `json:"isCorporateAdmin"`
 	MerchantID       uint      `json:"merchantId"`

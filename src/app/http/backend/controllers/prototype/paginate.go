@@ -12,5 +12,5 @@ func (p prototypeController) Paginate(c *fiber.Ctx) error {
 		return err
 	}
 
-	return ApiResource.SuccessResponse(c, data, nil, nil)
+	return ApiResource.SuccessResponse(c, data, nil)
 }

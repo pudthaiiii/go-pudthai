@@ -8,20 +8,18 @@ type Status struct {
 }
 
 type successResponse struct {
-	Data   interface{} `json:"data,omitempty"`
-	Links  interface{} `json:"links,omitempty"`
-	Meta   interface{} `json:"meta,omitempty"`
-	Status Status      `json:"status"`
+	Data       interface{} `json:"data,omitempty"`
+	Pagination interface{} `json:"pagination,omitempty"`
+	Status     Status      `json:"status"`
 }
 
-func SuccessResponse(c *fiber.Ctx, data, links, meta interface{}) error {
+func SuccessResponse(c *fiber.Ctx, data, pagination interface{}) error {
 	return c.JSON(successResponse{
 		Status: Status{
 			Code:    fiber.StatusOK,
 			Message: "OK",
 		},
-		Data:  data,
-		Links: links,
-		Meta:  meta,
+		Data:       data,
+		Pagination: pagination,
 	})
 }
