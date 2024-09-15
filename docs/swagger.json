@@ -4,15 +4,65 @@
         "contact": {}
     },
     "paths": {
-        "/prototype": {
-            "get": {
-                "description": "get plant",
-                "tags": [
-                    "Plant"
+        "/users": {
+            "post": {
+                "description": "Creates a new user and optionally uploads an avatar",
+                "consumes": [
+                    "multipart/form-data"
                 ],
-                "summary": "get plant",
-                "operationId": "get-plant",
-                "responses": {}
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "users"
+                ],
+                "summary": "Create a new user",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "dto",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.CreateRequest"
+                        }
+                    },
+                    {
+                        "type": "file",
+                        "description": "User avatar",
+                        "name": "avatar",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.CreateResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dtos.CreateRequest": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.CreateResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
             }
         }
     }

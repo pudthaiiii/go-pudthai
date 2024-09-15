@@ -1,12 +1,43 @@
+definitions:
+  dtos.CreateRequest:
+    properties:
+      name:
+        type: string
+    required:
+    - name
+    type: object
+  dtos.CreateResponse:
+    properties:
+      id:
+        type: integer
+    type: object
 info:
   contact: {}
 paths:
-  /prototype:
-    get:
-      description: get plant
-      operationId: get-plant
-      responses: {}
-      summary: get plant
+  /users:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Creates a new user and optionally uploads an avatar
+      parameters:
+      - description: User data
+        in: body
+        name: dto
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.CreateRequest'
+      - description: User avatar
+        in: formData
+        name: avatar
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dtos.CreateResponse'
+      summary: Create a new user
       tags:
-      - Plant
+      - users
 swagger: "2.0"

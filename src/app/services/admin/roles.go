@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 
 	"go-ibooking/src/app/model"
 	"go-ibooking/src/app/model/scopes"
@@ -17,22 +18,22 @@ import (
 	dtoRes "go-ibooking/src/app/http/admin/dtos/response/roles"
 )
 
-type RoleService interface {
+type RolesService interface {
 	Paginate(ctx context.Context, params req.PaginateRequest) (result []dtoRes.RolePaginateResponse, paginate res.Pagination, err error)
 	Create(ctx context.Context, dto dtoReq.RoleCreateRequest) (dtoRes.CreateRoleResponse, error)
 }
 
-type roleService struct {
+type rolesService struct {
 	roleRepo *gorm.DB
 }
 
-func NewRoleService(roleRepo *gorm.DB) RoleService {
-	return &roleService{
+func NewRoleService(roleRepo *gorm.DB) RolesService {
+	return &rolesService{
 		roleRepo,
 	}
 }
 
-func (s *roleService) Create(ctx context.Context, dto dtoReq.RoleCreateRequest) (dtoRes.CreateRoleResponse, error) {
+func (s *rolesService) Create(ctx context.Context, dto dtoReq.RoleCreateRequest) (dtoRes.CreateRoleResponse, error) {
 	response := dtoRes.CreateRoleResponse{}
 
 	role := model.Role{
@@ -54,16 +55,20 @@ func (s *roleService) Create(ctx context.Context, dto dtoReq.RoleCreateRequest) 
 	return response, nil
 }
 
-func (s *roleService) Paginate(ctx context.Context, params req.PaginateRequest) (result []dtoRes.RolePaginateResponse, paginate res.Pagination, err error) {
+func (s *rolesService) Paginate(ctx context.Context, params req.PaginateRequest) (result []dtoRes.RolePaginateResponse, paginate res.Pagination, err error) {
 	var totalRecord int64
+
+	fmt.Println("params", params)
 	roles := []model.Role{}
 	keySearch := []string{"name", "description"}
 
 	countBuilder := s.roleRepo.
+		Model(&model.Role{}).
 		Scopes(
 			scopes.WithSearch(params.Search, keySearch),
+			scopes.WithIsActive(params.Filters.IsActive),
 		).
-		Model(&model.Role{}).Count(&totalRecord)
+		Count(&totalRecord)
 
 	if countBuilder.Error != nil {
 		return result, paginate, throw.Error(910102, countBuilder.Error)
@@ -76,6 +81,7 @@ func (s *roleService) Paginate(ctx context.Context, params req.PaginateRequest) 
 	queryBuilder := s.roleRepo.
 		Scopes(
 			scopes.WithSearchAndPaginate(params.Search, keySearch, params.Page, params.PerPage),
+			scopes.WithIsActive(params.Filters.IsActive),
 		).
 		Find(&roles)
 
@@ -95,19 +101,13 @@ func (s *roleService) Paginate(ctx context.Context, params req.PaginateRequest) 
 
 func transformRoleToResponse(role model.Role) dtoRes.RolePaginateResponse {
 	return dtoRes.RolePaginateResponse{
-		ID:               role.ID,
 		Uuid:             role.Uuid,
 		Name:             role.Name,
 		Description:      role.Description,
 		IsActive:         role.IsActive,
 		IsCorporateAdmin: role.IsCorporateAdmin,
 		MerchantID:       role.MerchantID,
-		CreatedAt:        role.CreatedAt.Format("2006-01-02 15:04:05"),
-		UpdatedAt:        role.UpdatedAt.Format("2006-01-02 15:04:05"),
-		Merchant: dtoRes.RoleMerchant{
-			ID:   role.Merchant.ID,
-			Name: role.Merchant.Name,
-			Uuid: role.Merchant.Uuid,
-		},
+		CreatedAt:        role.CreatedAt.String(),
+		UpdatedAt:        role.UpdatedAt.String(),
 	}
 }

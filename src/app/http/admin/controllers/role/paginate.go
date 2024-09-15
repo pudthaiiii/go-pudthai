@@ -10,6 +10,7 @@ import (
 
 func (s roleController) Paginate(c *fiber.Ctx) error {
 	params := dtos.PaginateRequest{}
+	params.SetDefaults()
 
 	if errValidate := validator.Validate(c, &params); errValidate != nil {
 		return errValidate

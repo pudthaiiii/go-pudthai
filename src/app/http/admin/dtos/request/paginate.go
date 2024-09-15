@@ -1,10 +1,15 @@
 package dtos
 
 type PaginateRequest struct {
-	Filters []interface{} `json:"filters"`
+	Filters FilterRequest `json:"filters"`
 	Search  string        `json:"search"`
 	Page    int           `json:"page"`
 	PerPage int           `json:"perPage"`
+}
+
+type FilterRequest struct {
+	IsActive *int   `json:"isActive" validate:"omitempty,oneOrZero"`
+	Status   string `json:"status"`
 }
 
 func (p *PaginateRequest) SetDefaults() {

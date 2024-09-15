@@ -40,7 +40,7 @@ func (r *registry) NewAdminController() a.AdminController {
 	ac := a.AdminController{
 		PrototypeController: r.RegisterPrototypeController(),
 		RoleController:      r.RegisterRoleController(),
-
+		UsersController:     r.RegisterUsersController(),
 		// add more controller here
 	}
 

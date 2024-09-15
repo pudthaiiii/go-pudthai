@@ -15,8 +15,15 @@ func (r *registry) RegisterPrototypeService() a.PrototypeService {
 	)
 }
 
-func (r *registry) RegisterRoleService() a.RoleService {
+func (r *registry) RegisterRoleService() a.RolesService {
 	return a.NewRoleService(
 		r.db.Model(&model.Role{}).Session(&gorm.Session{NewDB: true}),
+	)
+}
+
+func (r *registry) RegisterUsersService() a.UsersService {
+	return a.NewUsersService(
+		r.db.Model(&model.User{}).Session(&gorm.Session{NewDB: true}),
+		r.s3,
 	)
 }

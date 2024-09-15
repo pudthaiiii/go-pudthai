@@ -8,5 +8,6 @@ func init() {
 
 func validateOneOrZero(fl validator.FieldLevel) bool {
 	value := fl.Field().Int()
+
 	return value == 0 || value == 1
 }

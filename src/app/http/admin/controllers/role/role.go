@@ -12,10 +12,10 @@ type RoleController interface {
 }
 
 type roleController struct {
-	roleService service.RoleService
+	roleService service.RolesService
 }
 
-func NewRoleController(roleService service.RoleService) RoleController {
+func NewRoleController(roleService service.RolesService) RoleController {
 	return &roleController{
 		roleService,
 	}

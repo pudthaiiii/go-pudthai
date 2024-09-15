@@ -3,14 +3,17 @@ package route
 import (
 	controller "go-ibooking/src/app/http/admin"
 	am "go-ibooking/src/app/middleware/admin"
+	"go-ibooking/src/types"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func InitializeAdminRoute(app *fiber.App, c controller.AdminController, m am.Middleware) *fiber.App {
-	routes := addPrototypeRoute(c.PrototypeController)
+	var routes = types.Routes{}
 
+	routes = append(routes, addPrototypeRoute(c.PrototypeController)...)
 	routes = append(routes, addRoleRoute(c.RoleController)...)
+	routes = append(routes, addUsersRoute(c.UsersController)...)
 
 	prefix := app.Group("/v1/admin")
 
