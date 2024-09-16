@@ -10,18 +10,18 @@ func addPrototypeRoute(c controller.PrototypeController) technical.Routes {
 		technical.Route{
 			Name:        "Paginate",
 			Method:      "GET",
-			Pattern:     "/prototype",
-			Operation:   "",
-			Resource:    "",
+			Path:        "/prototype",
+			Action:      "",
+			Subject:     "",
 			HandlerFunc: c.Paginate,
 		},
 
 		technical.Route{
 			Name:        "Paginate",
 			Method:      "POST",
-			Pattern:     "/prototype",
-			Operation:   "",
-			Resource:    "",
+			Path:        "/prototype",
+			Action:      "",
+			Subject:     "",
 			HandlerFunc: c.Create,
 		},
 	}

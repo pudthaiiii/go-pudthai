@@ -10,18 +10,18 @@ func addRoleRoute(c controller.RoleController) types.Routes {
 		types.Route{
 			Name:        "Paginate",
 			Method:      "GET",
-			Pattern:     "/roles",
-			Operation:   "",
-			Resource:    "",
+			Path:        "/roles",
+			Action:      "",
+			Subject:     "",
 			HandlerFunc: c.Paginate,
 		},
 
 		types.Route{
 			Name:        "Create",
 			Method:      "POST",
-			Pattern:     "/role",
-			Operation:   "",
-			Resource:    "",
+			Path:        "/role",
+			Action:      "",
+			Subject:     "",
 			HandlerFunc: c.Create,
 		},
 	}

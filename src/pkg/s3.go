@@ -83,7 +83,7 @@ func (s *S3Datastore) GenerateSignedURL(key string, expiresIn time.Duration) (st
 	return signedURL.URL, nil
 }
 
-func (s *S3Datastore) ValidateAndUpload(file *multipart.FileHeader, fileName string) (*s3.PutObjectOutput, error) {
+func (s *S3Datastore) ValidateAndUpload(ctx context.Context, file *multipart.FileHeader, fileName string) (*s3.PutObjectOutput, error) {
 	if file == nil {
 		return nil, throw.Error(910003, fmt.Errorf("file is required"))
 	}

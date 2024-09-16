@@ -7,7 +7,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 
-	am "go-ibooking/src/app/middleware/admin"
+	am "go-ibooking/src/app/http/middleware/admin"
 
 	"gorm.io/gorm"
 )
@@ -41,6 +41,7 @@ func (r *registry) NewAdminController() a.AdminController {
 		PrototypeController: r.RegisterPrototypeController(),
 		RoleController:      r.RegisterRoleController(),
 		UsersController:     r.RegisterUsersController(),
+		AuthController:      r.RegisterAuthController(),
 		// add more controller here
 	}
 
@@ -58,5 +59,5 @@ func (r *registry) NewBackendController() backend.BackendController {
 }
 
 func (r *registry) NewAdminMiddleware() am.Middleware {
-	return am.NewMiddleware()
+	return am.NewMiddleware(r.db, r.redis)
 }

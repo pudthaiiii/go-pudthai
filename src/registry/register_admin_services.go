@@ -27,3 +27,10 @@ func (r *registry) RegisterUsersService() a.UsersService {
 		r.s3,
 	)
 }
+
+func (r *registry) RegisterAuthService() a.AuthService {
+	return a.NewAuthService(
+		r.db.Model(&model.User{}).Session(&gorm.Session{NewDB: true}),
+		r.RegisterUsersService(),
+	)
+}

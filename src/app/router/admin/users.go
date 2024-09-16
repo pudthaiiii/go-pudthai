@@ -10,9 +10,9 @@ func addUsersRoute(c controller.UsersController) types.Routes {
 		types.Route{
 			Name:        "Create",
 			Method:      "POST",
-			Pattern:     "/users",
-			Operation:   "",
-			Resource:    "",
+			Path:        "/users",
+			Action:      "",
+			Subject:     "",
 			HandlerFunc: c.Create,
 		},
 	}

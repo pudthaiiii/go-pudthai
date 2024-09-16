@@ -3,6 +3,7 @@ package main
 import (
 	ApiResource "go-ibooking/src/app/resources"
 	"go-ibooking/src/utils"
+	"time"
 
 	log "go-ibooking/src/pkg/logger"
 
@@ -25,11 +26,15 @@ func main() {
 }
 
 func initFiberRouter() *fiber.App {
-	bodyLimit, _ := utils.CalFileSize("20mb")
+	bodyLimit, _ := utils.CalFileSize("100mb")
 
 	app := fiber.New(fiber.Config{
-		BodyLimit:    int(bodyLimit),
-		ErrorHandler: ApiResource.ErrorHandler,
+		BodyLimit:       int(bodyLimit),
+		ReadBufferSize:  int(bodyLimit),
+		WriteBufferSize: int(bodyLimit),
+		ReadTimeout:     10 * time.Second,
+		WriteTimeout:    10 * time.Second,
+		ErrorHandler:    ApiResource.ErrorHandler,
 	})
 
 	return app

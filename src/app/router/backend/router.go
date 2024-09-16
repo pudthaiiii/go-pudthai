@@ -2,7 +2,7 @@ package route
 
 import (
 	controller "go-ibooking/src/app/http/backend"
-	am "go-ibooking/src/app/middleware/admin"
+	am "go-ibooking/src/app/http/middleware/admin"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -21,9 +21,9 @@ func InitializeBackendRoute(app *fiber.App, c controller.BackendController, m am
 		handler := route.HandlerFunc
 
 		// add middleware for admin here
-		handler = m.Authenticate(handler)
+		handler = m.Authenticate(handler, route.Action, route.Subject)
 
-		prefix.Add(route.Method, route.Pattern, handler)
+		prefix.Add(route.Method, route.Path, handler)
 	}
 
 	return app

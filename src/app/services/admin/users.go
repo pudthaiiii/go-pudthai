@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"mime/multipart"
@@ -23,7 +24,8 @@ type usersService struct {
 }
 
 type UsersService interface {
-	Create(dto dtoReq.Create, avatar *multipart.FileHeader) (dtoRes.Create, error)
+	Create(ctx context.Context, dto dtoReq.Create, avatar *multipart.FileHeader) (dtoRes.Create, error)
+	FindUserByEmail(ctx context.Context, email string) (model.User, error)
 }
 
 func NewUsersService(usersRepo *gorm.DB, s3 *pkg.S3Datastore) UsersService {
@@ -34,7 +36,7 @@ func NewUsersService(usersRepo *gorm.DB, s3 *pkg.S3Datastore) UsersService {
 }
 
 // Create new user
-func (s *usersService) Create(dto dtoReq.Create, file *multipart.FileHeader) (dtoRes.Create, error) {
+func (s *usersService) Create(ctx context.Context, dto dtoReq.Create, file *multipart.FileHeader) (dtoRes.Create, error) {
 	fileName := ""
 	response := dtoRes.Create{}
 
@@ -49,7 +51,7 @@ func (s *usersService) Create(dto dtoReq.Create, file *multipart.FileHeader) (dt
 		avatarName := uuid.New()
 		fileName = fmt.Sprintf("users/%s%s", avatarName.String(), ".jpg")
 
-		_, err := s.s3.ValidateAndUpload(file, fileName)
+		_, err := s.s3.ValidateAndUpload(ctx, file, fileName)
 		if err != nil {
 			return response, throw.Error(910201, err)
 		}
@@ -87,7 +89,7 @@ func (s *usersService) Create(dto dtoReq.Create, file *multipart.FileHeader) (dt
 	return response, nil
 }
 
-// Find user by email
+// check exist user by email
 func (s *usersService) existingUserByEmail(email string) error {
 	user := model.User{
 		Email: email,
@@ -103,4 +105,15 @@ func (s *usersService) existingUserByEmail(email string) error {
 	}
 
 	return nil
+}
+
+func (s *usersService) FindUserByEmail(ctx context.Context, email string) (model.User, error) {
+	user := model.User{}
+
+	userQuery := s.usersRepo.Where("email = ?", email).First(&user)
+	if userQuery.Error == gorm.ErrRecordNotFound {
+		return user, throw.Error(910204, userQuery.Error)
+	}
+
+	return user, nil
 }
