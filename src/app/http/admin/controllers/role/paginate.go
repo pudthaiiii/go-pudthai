@@ -2,7 +2,7 @@ package controllers
 
 import (
 	dtos "go-ibooking/src/app/http/admin/dtos/request"
-	ApiResource "go-ibooking/src/app/resources"
+	ApiResource "go-ibooking/src/app/http/resources"
 	"go-ibooking/src/app/validator"
 
 	"github.com/gofiber/fiber/v2"

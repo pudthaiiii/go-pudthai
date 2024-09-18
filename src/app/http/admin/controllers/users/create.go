@@ -7,7 +7,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 
-	ApiResource "go-ibooking/src/app/resources"
+	ApiResource "go-ibooking/src/app/http/resources"
 )
 
 func (s usersController) Create(c *fiber.Ctx) error {

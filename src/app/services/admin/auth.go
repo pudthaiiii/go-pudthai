@@ -48,7 +48,6 @@ func (s *authService) Login(ctx context.Context, dto dtoReq.Login) (dtoRes.Creat
 }
 
 func (s *authService) generateJwt(user model.User) error {
-
 	jwtAdminSecret := os.Getenv("JWT_ADMIN_SECRET")
 	accessExpiresIn := os.Getenv("JWT_ACCESS_TOKEN_EXPIRES_IN_HOUR")
 	refreshExpiresIn := os.Getenv("JWT_REFRESH_TOKEN_EXPIRES_IN_HOUR")

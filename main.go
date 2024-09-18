@@ -1,7 +1,7 @@
 package main
 
 import (
-	ApiResource "go-ibooking/src/app/resources"
+	ApiResource "go-ibooking/src/app/http/resources"
 	"go-ibooking/src/utils"
 	"time"
 

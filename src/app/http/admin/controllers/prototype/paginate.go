@@ -1,7 +1,7 @@
 package controllers
 
 import (
-	ApiResource "go-ibooking/src/app/resources"
+	ApiResource "go-ibooking/src/app/http/resources"
 
 	"github.com/gofiber/fiber/v2"
 )
