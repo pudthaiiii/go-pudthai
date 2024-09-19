@@ -9,8 +9,8 @@ import (
 )
 
 func InitializeRoute(fiber *fiber.App, r registry.Registry) *fiber.App {
-	routerAdmin.InitializeAdminRoute(fiber, r.NewAdminController(), r.NewAdminMiddleware())
 	routerConsole.InitializeConsoleRoute(fiber, r.NewConsoleController(), r.NewAdminMiddleware())
+	routerAdmin.InitializeAdminRoute(fiber, r.NewAdminController(), r.NewAdminMiddleware())
 
 	return fiber
 }
