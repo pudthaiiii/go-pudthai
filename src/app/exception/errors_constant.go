@@ -2,7 +2,7 @@ package throw
 
 import (
 	"fmt"
-	"go-ibooking/src/pkg/logger"
+	"go-ibooking/internal/infrastructure/logger"
 )
 
 var ErrorCodes = map[int]string{

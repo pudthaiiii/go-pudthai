@@ -12,10 +12,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 
+	"go-ibooking/internal/model"
 	throw "go-ibooking/src/app/exception"
 	dtoReq "go-ibooking/src/app/http/admin/dtos/request/users"
 	dtoRes "go-ibooking/src/app/http/admin/dtos/response/users"
-	"go-ibooking/src/app/model"
 )
 
 type usersService struct {
