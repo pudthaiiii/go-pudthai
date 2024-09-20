@@ -2,7 +2,7 @@ package logger
 
 import (
 	"fmt"
-	"go-ibooking/config"
+	"go-ibooking/internal/config"
 	"io"
 	"os"
 	"path/filepath"

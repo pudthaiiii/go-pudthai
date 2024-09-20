@@ -3,7 +3,7 @@ package logger
 import (
 	"context"
 	"fmt"
-	"go-ibooking/config"
+	"go-ibooking/internal/config"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"

@@ -1,9 +1,9 @@
 package registry
 
 import (
-	"go-ibooking/config"
 	"go-ibooking/internal/adapter/v1/controllers"
 	cc "go-ibooking/internal/adapter/v1/controllers/console"
+	"go-ibooking/internal/config"
 	"go-ibooking/internal/infrastructure/datastore"
 
 	"github.com/go-redis/redis/v8"

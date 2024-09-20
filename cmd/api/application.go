@@ -1,7 +1,7 @@
-package app
+package api
 
 import (
-	"go-ibooking/config"
+	"go-ibooking/internal/config"
 	"go-ibooking/internal/infrastructure/datastore"
 	"go-ibooking/internal/infrastructure/logger"
 	"go-ibooking/internal/infrastructure/router"
@@ -17,7 +17,7 @@ type application struct {
 	cfg   *config.Config
 }
 
-func NewApplication() *application {
+func NewApiApplication() *application {
 	config, err := config.NewConfig()
 	if err != nil {
 		log.Printf("unable to load config, %v", err)
@@ -48,22 +48,19 @@ func (app *application) Boot() {
 	app.loadLogger()
 	app.loadRouter()
 
-	logger.Log.Info().Msg("Logger loaded")
+	app.listen()
 }
 
-// Load Router
 func (app *application) loadRouter() {
 	r := app.setupRegistry()
 
 	router.InitializeRoute(app.fiber, r)
 }
 
-// Load Logger
 func (app *application) loadLogger() {
 	logger.NewInitializeLogger(app.cfg)
 }
 
-// setupRegistry
 func (app *application) setupRegistry() registry.Registry {
 	db := datastore.NewPgDatastore(app.cfg)
 	redis := datastore.NewRedisDatastore(app.cfg)
@@ -73,8 +70,7 @@ func (app *application) setupRegistry() registry.Registry {
 	return registry.NewRegistry(db, redis.Client, s3, cfg)
 }
 
-// Passed
-func (app *application) Listen() {
+func (app *application) listen() {
 	port := app.cfg.Get("FiberConfig")["Port"].(string)
 
 	if err := app.fiber.Listen(":" + port); err != nil {

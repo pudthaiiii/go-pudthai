@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"go-ibooking/config"
+	"go-ibooking/internal/config"
 	throw "go-ibooking/internal/exception"
 	"go-ibooking/internal/infrastructure/logger"
 	"go-ibooking/internal/utils"

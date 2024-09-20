@@ -3,7 +3,7 @@ package datastore
 import (
 	"context"
 	"fmt"
-	"go-ibooking/config"
+	"go-ibooking/internal/config"
 	log "go-ibooking/internal/infrastructure/logger"
 	"net/url"
 	"os"

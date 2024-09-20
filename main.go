@@ -1,17 +1,10 @@
 package main
 
-import (
-	"go-ibooking/cmd/app"
-)
-
-type Abc struct {
-	Port string
-}
+import "go-ibooking/cmd/api"
 
 func main() {
-	application := app.NewApplication()
+	application := api.NewApiApplication()
+	application.DeferClose()
 
 	application.Boot()
-
-	application.Listen()
 }
