@@ -1,15 +1,12 @@
 package registry
 
 import (
+	"go-ibooking/config"
+	"go-ibooking/internal/adapter/v1/controllers"
+	cc "go-ibooking/internal/adapter/v1/controllers/console"
 	"go-ibooking/internal/infrastructure/datastore"
-	a "go-ibooking/src/app/http/admin"
 
 	"github.com/go-redis/redis/v8"
-
-	am "go-ibooking/src/app/http/middleware/admin"
-
-	consoleController "go-ibooking/internal/adapter/controllers/v1/console"
-
 	"gorm.io/gorm"
 )
 
@@ -17,46 +14,45 @@ type registry struct {
 	db    *gorm.DB
 	redis redis.UniversalClient
 	s3    *datastore.S3Datastore
+	cfg   *config.Config
 }
 
 type Registry interface {
-	NewAdminController() a.AdminController
-	NewConsoleController() consoleController.ConsoleController
-	NewAdminMiddleware() am.Middleware
+	NewController() controllers.AppController
+	NewConsoleController() cc.ConsoleController
+	// NewAdminMiddleware() am.Middleware
 }
 
 func NewRegistry(
 	db *gorm.DB,
 	redisClient redis.UniversalClient,
 	s3 *datastore.S3Datastore,
+	cfg *config.Config,
 ) Registry {
 	return &registry{
 		db:    db,
 		redis: redisClient,
 		s3:    s3,
+		cfg:   cfg,
 	}
 }
 
-func (r *registry) NewAdminController() a.AdminController {
-	ac := a.AdminController{
-		RoleController:  r.RegisterRoleController(),
+func (r *registry) NewController() controllers.AppController {
+	ac := controllers.AppController{
 		UsersController: r.RegisterUsersController(),
-		AuthController:  r.RegisterAuthController(),
-		// add more controller here
 	}
 
 	return ac
 }
 
-func (r *registry) NewConsoleController() consoleController.ConsoleController {
-	ac := consoleController.ConsoleController{
+func (r *registry) NewConsoleController() cc.ConsoleController {
+	ac := cc.ConsoleController{
 		FeaturesController: r.RegisterFeaturesController(),
-		// add more controller here
 	}
 
 	return ac
 }
 
-func (r *registry) NewAdminMiddleware() am.Middleware {
-	return am.NewMiddleware(r.db, r.redis)
-}
+// func (r *registry) NewAdminMiddleware() am.Middleware {
+// 	return am.NewMiddleware(r.db, r.redis)
+// }

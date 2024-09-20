@@ -1,13 +1,13 @@
 package router
 
 import (
-	console "go-ibooking/internal/adapter/controllers/v1/console"
-	"go-ibooking/src/types"
+	controller "go-ibooking/internal/adapter/v1/controllers/console"
+	"go-ibooking/internal/model/technical"
 )
 
-func addFeaturesRoute(c console.FeaturesController) types.Routes {
-	return types.Routes{
-		types.Route{
+func addFeaturesRoute(c controller.FeaturesController) technical.Routes {
+	return technical.Routes{
+		technical.Route{
 			Name:        "AutoMigrate",
 			Method:      "GET",
 			Path:        "/auto-migrate",

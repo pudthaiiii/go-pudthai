@@ -1,7 +1,7 @@
 package registry
 
 import (
-	console "go-ibooking/internal/adapter/controllers/v1/console"
+	console "go-ibooking/internal/adapter/v1/controllers/console"
 )
 
 // NewPrototypeController

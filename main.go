@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go-ibooking/internal/cmd/app"
+	"go-ibooking/cmd/app"
 )
 
 type Abc struct {
