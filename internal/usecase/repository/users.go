@@ -3,8 +3,9 @@ package repository
 import (
 	"context"
 	"go-ibooking/internal/entities"
-	"go-ibooking/internal/model/technical"
+	"go-ibooking/internal/model/dtos"
 
+	"github.com/jinzhu/copier"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -18,12 +19,12 @@ func NewUsersRepository(db *gorm.DB) UsersRepository {
 }
 
 type UsersRepository interface {
-	CreateAdminUser(ctx context.Context, dto technical.CreateAdminUser, fileName string) (technical.ResponseAdminUser, error)
+	CreateAdminUser(ctx context.Context, dto dtos.CreateUser, fileName string) (dtos.ShowUser, error)
 }
 
-func (r *usersRepository) CreateAdminUser(ctx context.Context, dto technical.CreateAdminUser, fileName string) (technical.ResponseAdminUser, error) {
+func (r *usersRepository) CreateAdminUser(ctx context.Context, dto dtos.CreateUser, fileName string) (dtos.ShowUser, error) {
 	var (
-		response technical.ResponseAdminUser
+		response dtos.ShowUser
 		user     entities.User
 	)
 
@@ -49,9 +50,7 @@ func (r *usersRepository) CreateAdminUser(ctx context.Context, dto technical.Cre
 		return response, queryBuilder.Error
 	}
 
-	response = technical.ResponseAdminUser{
-		ID: user.ID,
-	}
+	copier.Copy(&response, &user)
 
 	return response, nil
 }

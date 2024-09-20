@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
+	"go-ibooking/internal/config"
 	"go-ibooking/internal/infrastructure/logger"
 	"html/template"
 	"net/smtp"
-	"os"
 	"strings"
 )
 
-type emailClient struct {
+type Mailer struct {
 	smtpServer  string
 	smtpPort    string
 	username    string
@@ -21,19 +21,19 @@ type emailClient struct {
 	TemplateDir string
 }
 
-func NewEmailClient() *emailClient {
-	return &emailClient{
-		smtpServer:  os.Getenv("MAIL_HOST"),
-		smtpPort:    os.Getenv("MAIL_PORT"),
-		username:    os.Getenv("MAIL_USERNAME"),
-		password:    os.Getenv("MAIL_PASSWORD"),
-		fromAddress: os.Getenv("MAIL_FROM_ADDRESS"),
-		encryption:  os.Getenv("MAIL_ENCRYPTION"),
-		TemplateDir: "src/mails",
+func NewMailer(cfg *config.Config) *Mailer {
+	return &Mailer{
+		smtpServer:  cfg.Get("MailServer")["SmtpServer"].(string),
+		smtpPort:    cfg.Get("MailServer")["SmtpPort"].(string),
+		username:    cfg.Get("MailServer")["Username"].(string),
+		password:    cfg.Get("MailServer")["Password"].(string),
+		fromAddress: cfg.Get("MailServer")["FromAddress"].(string),
+		encryption:  cfg.Get("MailServer")["Encryption"].(string),
+		TemplateDir: "internal/mails",
 	}
 }
 
-func (e *emailClient) renderTemplate(templateFile string, data map[string]interface{}) (string, error) {
+func (e *Mailer) renderTemplate(templateFile string, data map[string]interface{}) (string, error) {
 	tmpl, err := template.ParseFiles(e.TemplateDir + "/" + templateFile)
 	if err != nil {
 		return "", err
@@ -47,7 +47,7 @@ func (e *emailClient) renderTemplate(templateFile string, data map[string]interf
 	return buf.String(), nil
 }
 
-func (e *emailClient) SendEmail(subject, templateFile string, data map[string]interface{}, toEmail string, bccEmails ...string) error {
+func (e *Mailer) SendEmail(subject, templateFile string, data map[string]interface{}, toEmail string, bccEmails ...string) error {
 	body, err := e.renderTemplate(templateFile, data)
 	if err != nil {
 		logger.Log.Err(err).Msg("failed to render template")
@@ -87,7 +87,7 @@ func formatBCC(bccEmails []string) string {
 	return fmt.Sprintf("%s", bccEmails)
 }
 
-func (e *emailClient) getSendFunction() func(auth smtp.Auth, recipients []string, msg []byte) error {
+func (e *Mailer) getSendFunction() func(auth smtp.Auth, recipients []string, msg []byte) error {
 	switch strings.ToLower(e.encryption) {
 	case "tls":
 		return e.sendEmailTLS
@@ -96,7 +96,7 @@ func (e *emailClient) getSendFunction() func(auth smtp.Auth, recipients []string
 	}
 }
 
-func (e *emailClient) sendEmailPlain(auth smtp.Auth, recipients []string, msg []byte) error {
+func (e *Mailer) sendEmailPlain(auth smtp.Auth, recipients []string, msg []byte) error {
 	return smtp.SendMail(
 		e.smtpServer+":"+e.smtpPort,
 		auth,
@@ -106,7 +106,7 @@ func (e *emailClient) sendEmailPlain(auth smtp.Auth, recipients []string, msg []
 	)
 }
 
-func (e *emailClient) sendEmailTLS(auth smtp.Auth, recipients []string, msg []byte) error {
+func (e *Mailer) sendEmailTLS(auth smtp.Auth, recipients []string, msg []byte) error {
 	tlsConfig := &tls.Config{
 		InsecureSkipVerify: true,
 		ServerName:         e.smtpServer,

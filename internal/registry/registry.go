@@ -4,17 +4,23 @@ import (
 	"go-ibooking/internal/adapter/v1/controllers"
 	cc "go-ibooking/internal/adapter/v1/controllers/console"
 	"go-ibooking/internal/config"
+	"go-ibooking/internal/infrastructure/cache"
 	"go-ibooking/internal/infrastructure/datastore"
+	"go-ibooking/internal/infrastructure/mailer"
+	"go-ibooking/internal/infrastructure/recaptcha"
 
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
 )
 
 type registry struct {
-	db    *gorm.DB
-	redis redis.UniversalClient
-	s3    *datastore.S3Datastore
-	cfg   *config.Config
+	db           *gorm.DB
+	redis        redis.UniversalClient
+	s3           *datastore.S3Datastore
+	cfg          *config.Config
+	recaptcha    *recaptcha.RecaptchaProvider
+	mailer       *mailer.Mailer
+	cacheManager *cache.CacheManager
 }
 
 type Registry interface {
@@ -28,12 +34,18 @@ func NewRegistry(
 	redisClient redis.UniversalClient,
 	s3 *datastore.S3Datastore,
 	cfg *config.Config,
+	recaptcha *recaptcha.RecaptchaProvider,
+	mailer *mailer.Mailer,
+	cacheManager *cache.CacheManager,
 ) Registry {
 	return &registry{
-		db:    db,
-		redis: redisClient,
-		s3:    s3,
-		cfg:   cfg,
+		db:           db,
+		redis:        redisClient,
+		s3:           s3,
+		cfg:          cfg,
+		recaptcha:    recaptcha,
+		mailer:       mailer,
+		cacheManager: cacheManager,
 	}
 }
 

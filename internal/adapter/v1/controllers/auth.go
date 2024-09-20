@@ -1,8 +1,10 @@
 package controllers
 
-// type AuthController interface {
-// 	Login(c *fiber.Ctx) error
-// }
+// import (
+// 	"go-ibooking/internal/validator"
+
+// 	"github.com/gofiber/fiber/v2"
+// )
 
 // type authController struct {
 // 	authService service.AuthService
@@ -12,6 +14,10 @@ package controllers
 // 	return &authController{
 // 		authService,
 // 	}
+// }
+
+// type AuthController interface {
+// 	Login(c *fiber.Ctx) error
 // }
 
 // func (s authController) Login(c *fiber.Ctx) error {
@@ -35,5 +41,5 @@ package controllers
 
 // 	// fmt.Println(tokenG.SignedString([]byte(os.Getenv("JWT_ADMIN_SECRET"))))
 
-// 	return ApiResource.SuccessResponse(c, result, nil)
+// 	return success(c, result, nil)
 // }

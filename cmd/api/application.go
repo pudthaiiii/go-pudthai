@@ -2,8 +2,11 @@ package api
 
 import (
 	"go-ibooking/internal/config"
+	"go-ibooking/internal/infrastructure/cache"
 	"go-ibooking/internal/infrastructure/datastore"
 	"go-ibooking/internal/infrastructure/logger"
+	"go-ibooking/internal/infrastructure/mailer"
+	"go-ibooking/internal/infrastructure/recaptcha"
 	"go-ibooking/internal/infrastructure/router"
 	"go-ibooking/internal/registry"
 	"log"
@@ -65,9 +68,13 @@ func (app *application) setupRegistry() registry.Registry {
 	db := datastore.NewPgDatastore(app.cfg)
 	redis := datastore.NewRedisDatastore(app.cfg)
 	s3 := datastore.NewS3Datastore(app.cfg)
+	recaptcha := recaptcha.NewRecaptchaProvider(app.cfg)
+	mailer := mailer.NewMailer(app.cfg)
 	cfg := app.cfg
 
-	return registry.NewRegistry(db, redis.Client, s3, cfg)
+	cacheManager := cache.NewCacheManager(redis.Client, 5*time.Minute)
+
+	return registry.NewRegistry(db, redis.Client, s3, cfg, recaptcha, mailer, cacheManager)
 }
 
 func (app *application) listen() {

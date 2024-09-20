@@ -61,5 +61,27 @@ func (c *Config) loadAppConfig() {
 			"LogGroupName":    getEnv("AWS_CLOUDWATCH_LOG_GROUP_NAME"),
 			"LogStreamName":   getEnv("AWS_CLOUDWATCH_LOG_STREAM_NAME"),
 		},
+
+		// GoogleRecaptcha config
+		"GoogleRecaptcha": map[string]interface{}{
+			"RecaptchaSecretKey": getEnv("GOOGLE_RECAPTCHA_SECRET_KEY"),
+		},
+
+		// MailServer config
+		"MailServer": map[string]interface{}{
+			"SmtpServer":  getEnv("MAIL_HOST"),
+			"SmtpPort":    getEnv("MAIL_PORT"),
+			"Username":    getEnv("MAIL_USERNAME"),
+			"Password":    getEnv("MAIL_PASSWORD"),
+			"FromAddress": getEnv("MAIL_FROM_ADDRESS"),
+			"Encryption":  getEnv("MAIL_ENCRYPTION"),
+		},
+
+		// JWT config
+		"JWT": map[string]interface{}{
+			"JwtSecret":               getEnv("JWT_SECRET"),
+			"JwtAccessExpiresInHour":  getEnv("JWT_ACCESS_TOKEN_EXPIRES_IN_HOUR"),
+			"JwtRefreshExpiresInHour": getEnv("JWT_REFRESH_TOKEN_EXPIRES_IN_HOUR"),
+		},
 	}
 }

@@ -1,8 +1,7 @@
 package controllers
 
 import (
-	"fmt"
-	"go-ibooking/internal/model/technical"
+	"go-ibooking/internal/model/dtos"
 	"go-ibooking/internal/usecase/interactor"
 	"go-ibooking/internal/validator"
 
@@ -24,10 +23,8 @@ type UsersController interface {
 }
 
 func (u usersController) Create(c *fiber.Ctx) error {
-	req := technical.CreateAdminUser{}
+	req := dtos.CreateUser{}
 	file, _ := c.FormFile("avatar")
-
-	fmt.Println(c.Locals("userId"))
 
 	if errValidate := validator.Validate(c, &req); errValidate != nil {
 		return errValidate

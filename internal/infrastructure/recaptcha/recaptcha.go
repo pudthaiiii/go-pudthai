@@ -3,19 +3,19 @@ package recaptcha
 import (
 	"encoding/json"
 	"fmt"
+	"go-ibooking/internal/config"
 	"go-ibooking/internal/infrastructure/logger"
 	"io/ioutil"
 	"net/http"
-	"os"
 )
 
 type RecaptchaProvider struct {
-	SecretKey string
+	secretKey string
 }
 
-func NewRecaptchaProvider() *RecaptchaProvider {
+func NewRecaptchaProvider(cfg *config.Config) *RecaptchaProvider {
 	return &RecaptchaProvider{
-		SecretKey: os.Getenv("GOOGLE_RECAPTCHA_SECRET_KEY"),
+		secretKey: cfg.Get("GoogleRecaptcha")["RecaptchaSecretKey"].(string),
 	}
 }
 
@@ -23,7 +23,7 @@ func (r *RecaptchaProvider) VerifyToken(token string) (bool, error) {
 	resp, err := http.PostForm(
 		"https://www.google.com/recaptcha/api/siteverify",
 		map[string][]string{
-			"secret":   {r.SecretKey},
+			"secret":   {r.secretKey},
 			"response": {token},
 		},
 	)

@@ -1,6 +1,10 @@
-package technical
+package dtos
 
-type CreateAdminUser struct {
+import (
+	"time"
+)
+
+type CreateUser struct {
 	FullName string `json:"fullName" validate:"required"`
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required,min=6"`
@@ -12,6 +16,11 @@ type CreateAdminUser struct {
 	IsAllBU  int    `json:"isAllBu" validate:"required,oneOrZero"`
 }
 
-type ResponseAdminUser struct {
+type ShowUser struct {
 	ID uint `json:"id"`
+	CreateUser
+	Password        string     `json:"-"`
+	EmailVerifiedAt *time.Time `json:"emailVerifiedAt"`
+	CreatedAt       time.Time  `json:"createdAt"`
+	UpdatedAt       time.Time  `json:"updatedAt"`
 }

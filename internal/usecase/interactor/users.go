@@ -6,7 +6,7 @@ import (
 	"mime/multipart"
 
 	"go-ibooking/internal/infrastructure/datastore"
-	"go-ibooking/internal/model/technical"
+	"go-ibooking/internal/model/dtos"
 	"go-ibooking/internal/usecase/repository"
 
 	"github.com/google/uuid"
@@ -20,7 +20,7 @@ type usersInteractor struct {
 }
 
 type UsersInteractor interface {
-	Create(ctx context.Context, dto technical.CreateAdminUser, avatar *multipart.FileHeader) (technical.ResponseAdminUser, error)
+	Create(ctx context.Context, dto dtos.CreateUser, avatar *multipart.FileHeader) (dtos.ShowUser, error)
 	// FindUserByEmail(ctx context.Context, email string) (entities.User, error)
 }
 
@@ -32,11 +32,11 @@ func NewUsersInteractor(userRepo repository.UsersRepository, s3 *datastore.S3Dat
 }
 
 // Create new user
-func (u *usersInteractor) Create(ctx context.Context, dto technical.CreateAdminUser, file *multipart.FileHeader) (technical.ResponseAdminUser, error) {
+func (u *usersInteractor) Create(ctx context.Context, dto dtos.CreateUser, file *multipart.FileHeader) (dtos.ShowUser, error) {
 	var (
 		err        error
 		fileName   string
-		createUser technical.ResponseAdminUser
+		createUser dtos.ShowUser
 	)
 
 	// check existing user
