@@ -2,16 +2,18 @@ package interactor
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"mime/multipart"
-
 	"go-ibooking/internal/infrastructure/datastore"
 	"go-ibooking/internal/model/dtos"
+	"go-ibooking/internal/throw"
 	"go-ibooking/internal/usecase/repository"
+	"mime/multipart"
 
 	"github.com/google/uuid"
-
-	throw "go-ibooking/internal/exception"
+	"github.com/jinzhu/copier"
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 type usersInteractor struct {
@@ -20,8 +22,7 @@ type usersInteractor struct {
 }
 
 type UsersInteractor interface {
-	Create(ctx context.Context, dto dtos.CreateUser, avatar *multipart.FileHeader) (dtos.ShowUser, error)
-	// FindUserByEmail(ctx context.Context, email string) (entities.User, error)
+	Create(ctx context.Context, dto dtos.CreateUser, avatar *multipart.FileHeader) (dtos.ResponseUserID, error)
 }
 
 func NewUsersInteractor(userRepo repository.UsersRepository, s3 *datastore.S3Datastore) UsersInteractor {
@@ -31,65 +32,39 @@ func NewUsersInteractor(userRepo repository.UsersRepository, s3 *datastore.S3Dat
 	}
 }
 
-// Create new user
-func (u *usersInteractor) Create(ctx context.Context, dto dtos.CreateUser, file *multipart.FileHeader) (dtos.ShowUser, error) {
+func (u *usersInteractor) Create(ctx context.Context, dto dtos.CreateUser, file *multipart.FileHeader) (dtos.ResponseUserID, error) {
 	var (
-		err        error
+		createUser dtos.ResponseUserID
 		fileName   string
-		createUser dtos.ShowUser
 	)
 
-	// check existing user
-	// existingErr := s.existingUserByEmail(dto.Email)
-	// if existingErr != nil {
-	// 	return response, existingErr
-	// }
+	existingUser, err := u.userRepo.FindUserByEmail(ctx, dto.Email, "")
+	if err != nil {
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return createUser, throw.UserCreate(err)
+		}
+	} else if existingUser.ID != 0 {
+		return createUser, throw.UserExists()
+	}
 
-	// upload avatar
 	if file != nil {
-		avatarName := uuid.New()
-		fileName = fmt.Sprintf("users/%s%s", avatarName.String(), ".jpg")
-
-		_, err := u.s3.ValidateAndUpload(ctx, file, fileName)
-		if err != nil {
-			return createUser, throw.Error(910201, err)
+		fileName = fmt.Sprintf("users/%s.jpg", uuid.New().String())
+		if _, err := u.s3.ValidateAndUpload(ctx, file, fileName); err != nil {
+			return createUser, throw.UploadError(err)
 		}
 	}
 
-	// save user
-	createUser, err = u.userRepo.CreateAdminUser(ctx, dto, fileName)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(dto.Password), bcrypt.DefaultCost)
 	if err != nil {
-		return createUser, throw.Error(910201, err)
+		return createUser, throw.UserCreate(err)
 	}
+
+	user, err := u.userRepo.CreateAdminUser(ctx, dto, fileName, string(hashedPassword))
+	if err != nil {
+		return createUser, throw.UserCreate(err)
+	}
+
+	copier.Copy(&createUser, &user)
 
 	return createUser, nil
 }
-
-// // check exist user by email
-// func (s *usersInteractor) existingUserByEmail(email string) error {
-// 	user := entities.User{
-// 		Email: email,
-// 	}
-
-// 	userExists := s.usersRepo.Where(&user).First(&user)
-// 	if userExists.Error == nil {
-// 		return throw.Error(910202, nil)
-// 	}
-
-// 	if !errors.Is(userExists.Error, gorm.ErrRecordNotFound) {
-// 		return throw.Error(910202, userExists.Error)
-// 	}
-
-// 	return nil
-// }
-
-// func (s *usersInteractor) FindUserByEmail(ctx context.Context, email string) (entities.User, error) {
-// 	user := entities.User{}
-
-// 	userQuery := s.usersRepo.Where("email = ?", email).First(&user)
-// 	if userQuery.Error == gorm.ErrRecordNotFound {
-// 		return user, throw.Error(910204, userQuery.Error)
-// 	}
-
-// 	return user, nil
-// }

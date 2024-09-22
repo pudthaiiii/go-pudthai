@@ -15,11 +15,11 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/users": {
+        "/v1/users": {
             "post": {
-                "description": "Creates a new user and optionally uploads an avatar",
+                "description": "Create a new user",
                 "consumes": [
-                    "multipart/form-data"
+                    "application/json"
                 ],
                 "produces": [
                     "application/json"
@@ -30,26 +30,31 @@ const docTemplate = `{
                 "summary": "Create a new user",
                 "parameters": [
                     {
-                        "description": "User data",
-                        "name": "dto",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dtos.CreateRequest"
-                        }
-                    },
-                    {
                         "type": "file",
                         "description": "User avatar",
                         "name": "avatar",
                         "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "User email",
+                        "name": "email",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "User password",
+                        "name": "password",
+                        "in": "formData",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dtos.CreateResponse"
+                            "$ref": "#/definitions/dtos.ResponseUserID"
                         }
                     }
                 }
@@ -57,18 +62,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "dtos.CreateRequest": {
-            "type": "object",
-            "required": [
-                "name"
-            ],
-            "properties": {
-                "name": {
-                    "type": "string"
-                }
-            }
-        },
-        "dtos.CreateResponse": {
+        "dtos.ResponseUserID": {
             "type": "object",
             "properties": {
                 "id": {

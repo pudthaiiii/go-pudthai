@@ -1,12 +1,5 @@
 definitions:
-  dtos.CreateRequest:
-    properties:
-      name:
-        type: string
-    required:
-    - name
-    type: object
-  dtos.CreateResponse:
+  dtos.ResponseUserID:
     properties:
       id:
         type: integer
@@ -14,29 +7,33 @@ definitions:
 info:
   contact: {}
 paths:
-  /users:
+  /v1/users:
     post:
       consumes:
-      - multipart/form-data
-      description: Creates a new user and optionally uploads an avatar
+      - application/json
+      description: Create a new user
       parameters:
-      - description: User data
-        in: body
-        name: dto
-        required: true
-        schema:
-          $ref: '#/definitions/dtos.CreateRequest'
       - description: User avatar
         in: formData
         name: avatar
         type: file
+      - description: User email
+        in: formData
+        name: email
+        required: true
+        type: string
+      - description: User password
+        in: formData
+        name: password
+        required: true
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dtos.CreateResponse'
+            $ref: '#/definitions/dtos.ResponseUserID'
       summary: Create a new user
       tags:
       - users

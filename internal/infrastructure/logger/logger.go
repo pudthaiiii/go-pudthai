@@ -13,9 +13,11 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var Log zerolog.Logger
-var Write zerolog.Logger
-var file *os.File
+var (
+	Log   zerolog.Logger
+	Write zerolog.Logger
+	file  *os.File
+)
 
 func NewInitializeLogger(cfg *config.Config) {
 	initLog(cfg)

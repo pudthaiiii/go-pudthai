@@ -1,8 +1,6 @@
 package controllers
 
 import (
-	"fmt"
-
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -18,21 +16,24 @@ type successResponse struct {
 }
 
 func success(c *fiber.Ctx, data, pagination interface{}) error {
-	statusCode := fiber.StatusOK
+	statusCode := getStatus(c)
 
-	if c.Route().Name == "Create" {
-		fmt.Println("Create")
-		statusCode = fiber.StatusCreated
+	response := successResponse{
+		Status: Status{
+			Code:    statusCode,
+			Message: "OK",
+		},
+		Data:       data,
+		Pagination: pagination,
 	}
 
-	return c.
-		Status(statusCode).
-		JSON(successResponse{
-			Status: Status{
-				Code:    statusCode,
-				Message: "OK",
-			},
-			Data:       data,
-			Pagination: pagination,
-		})
+	return c.Status(statusCode).JSON(response)
+}
+
+func getStatus(c *fiber.Ctx) int {
+	if c.Route().Name == "Create" {
+		return fiber.StatusCreated
+	}
+
+	return fiber.StatusOK
 }

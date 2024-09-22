@@ -41,6 +41,12 @@ func (r *RedisDatastore) Close() error {
 	return nil
 }
 
+func Ping(r *RedisDatastore) error {
+	var ctx = context.Background()
+
+	return r.Client.Ping(ctx).Err()
+}
+
 func connectRedisStandalone(cfg *config.Config) *redis.Client {
 	host := cfg.Get("Redis")["Host"].(string)
 	port := cfg.Get("Redis")["Port"].(string)

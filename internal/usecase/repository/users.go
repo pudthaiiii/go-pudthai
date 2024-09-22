@@ -5,8 +5,6 @@ import (
 	"go-ibooking/internal/entities"
 	"go-ibooking/internal/model/dtos"
 
-	"github.com/jinzhu/copier"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
@@ -19,21 +17,14 @@ func NewUsersRepository(db *gorm.DB) UsersRepository {
 }
 
 type UsersRepository interface {
-	CreateAdminUser(ctx context.Context, dto dtos.CreateUser, fileName string) (dtos.ShowUser, error)
+	CreateAdminUser(ctx context.Context, dto dtos.CreateUser, fileName string, password string) (entities.User, error)
+	FindUserByEmail(ctx context.Context, email string, userType string) (entities.User, error)
 }
 
-func (r *usersRepository) CreateAdminUser(ctx context.Context, dto dtos.CreateUser, fileName string) (dtos.ShowUser, error) {
-	var (
-		response dtos.ShowUser
-		user     entities.User
-	)
-
-	// hash password
-	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(dto.Password), bcrypt.DefaultCost)
-
-	user = entities.User{
+func (r *usersRepository) CreateAdminUser(ctx context.Context, dto dtos.CreateUser, fileName string, password string) (entities.User, error) {
+	var user = entities.User{
 		Email:        dto.Email,
-		Password:     string(hashedPassword),
+		Password:     string(password),
 		RoleID:       dto.RoleID,
 		ProfileImage: fileName,
 		IsActive:     dto.IsActive,
@@ -45,12 +36,23 @@ func (r *usersRepository) CreateAdminUser(ctx context.Context, dto dtos.CreateUs
 		MerchantID:   1,
 	}
 
-	queryBuilder := r.db.Create(&user)
-	if queryBuilder.Error != nil {
-		return response, queryBuilder.Error
+	query := r.db.WithContext(ctx).Create(&user)
+	if query.Error != nil {
+		return user, query.Error
 	}
 
-	copier.Copy(&response, &user)
+	return user, nil
+}
 
-	return response, nil
+func (r *usersRepository) FindUserByEmail(ctx context.Context, email string, userType string) (entities.User, error) {
+	var user entities.User
+
+	query := r.db.WithContext(ctx).Where("email = ?", email)
+
+	if userType != "" {
+		query = query.Where("type = ?", userType)
+	}
+
+	err := query.First(&user).Error
+	return user, err
 }

@@ -3,14 +3,13 @@ package interactor
 // import (
 // 	"context"
 // 	"fmt"
+// 	"go-ibooking/internal/entities"
+// 	"go-ibooking/internal/throw"
+// 	"go-ibooking/internal/utils"
 // 	"os"
 
 // 	"golang.org/x/crypto/bcrypt"
 // 	"gorm.io/gorm"
-
-// 	throw "go-ibooking/exception"
-// 	"go-ibooking/internal/entities"
-// 	"go-ibooking/internal/utils"
 // )
 
 // type authService struct {

@@ -2,7 +2,6 @@ package controllers
 
 // import (
 // 	"go-ibooking/internal/validator"
-
 // 	"github.com/gofiber/fiber/v2"
 // )
 

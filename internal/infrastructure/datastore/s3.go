@@ -5,8 +5,8 @@ import (
 	"context"
 	"fmt"
 	"go-ibooking/internal/config"
-	throw "go-ibooking/internal/exception"
 	"go-ibooking/internal/infrastructure/logger"
+	"go-ibooking/internal/throw"
 	"go-ibooking/internal/utils"
 	"io"
 	"mime/multipart"
@@ -78,7 +78,6 @@ func (s *S3Datastore) GenerateSignedURL(key string, expiresIn time.Duration) (st
 	}, s3.WithPresignExpires(expiresIn))
 
 	if err != nil {
-		logger.Log.Err(err).Msg("failed to sign request")
 		return "", fmt.Errorf("failed to sign request: %w", err)
 	}
 
@@ -87,13 +86,13 @@ func (s *S3Datastore) GenerateSignedURL(key string, expiresIn time.Duration) (st
 
 func (s *S3Datastore) ValidateAndUpload(ctx context.Context, file *multipart.FileHeader, fileName string) (*s3.PutObjectOutput, error) {
 	if file == nil {
-		return nil, throw.Error(910003, fmt.Errorf("file is required"))
+		return nil, fmt.Errorf("file is required")
 	}
 
 	fileExtension := filepath.Ext(file.Filename)
 
 	if !contains(s.AllowedExtensions, fileExtension) {
-		return nil, throw.Error(910003, fmt.Errorf("invalid file type. %s", s.AllowedExtensions))
+		return nil, fmt.Errorf("invalid file type. %s", s.AllowedExtensions)
 	}
 
 	if s.MaxFileSize != "" {
@@ -101,19 +100,19 @@ func (s *S3Datastore) ValidateAndUpload(ctx context.Context, file *multipart.Fil
 		maxFileSize := limit
 
 		if file.Size > maxFileSize {
-			return nil, throw.Error(910003, fmt.Errorf("file size exceeds the limit of %s", s.MaxFileSize))
+			return nil, fmt.Errorf("file size exceeds the limit of %s", s.MaxFileSize)
 		}
 	}
 
 	src, err := file.Open()
 	if err != nil {
-		return nil, throw.Error(910003, err)
+		return nil, err
 	}
 	defer src.Close()
 
 	buffer := new(bytes.Buffer)
 	if _, err := buffer.ReadFrom(src); err != nil {
-		return nil, throw.Error(910003, err)
+		return nil, err
 	}
 
 	return s.UploadFile(context.Background(), fileName, buffer.Bytes())
@@ -145,14 +144,12 @@ func (s *S3Datastore) GetFile(ctx context.Context, key string) ([]byte, error) {
 
 	result, err := s.client.GetObject(ctx, input)
 	if err != nil {
-		logger.Log.Err(err).Msg("failed to get file")
 		return nil, err
 	}
 	defer result.Body.Close()
 
 	body, err := io.ReadAll(result.Body)
 	if err != nil {
-		logger.Log.Err(err).Msg("failed to read file")
 		return nil, err
 	}
 
@@ -167,7 +164,6 @@ func (s *S3Datastore) DeleteFile(ctx context.Context, key string) error {
 
 	_, err := s.client.DeleteObject(ctx, input)
 	if err != nil {
-		logger.Log.Err(err).Msg("failed to delete file")
 		return err
 	}
 
@@ -180,5 +176,6 @@ func contains(slice []string, value string) bool {
 			return true
 		}
 	}
+
 	return false
 }

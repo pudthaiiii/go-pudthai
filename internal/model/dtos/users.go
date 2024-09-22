@@ -16,10 +16,21 @@ type CreateUser struct {
 	IsAllBU  int    `json:"isAllBu" validate:"required,oneOrZero"`
 }
 
-type ShowUser struct {
+type ResponseUserID struct {
 	ID uint `json:"id"`
-	CreateUser
-	Password        string     `json:"-"`
+}
+
+type ResponseUserData struct {
+	ID              uint       `json:"id"`
+	FullName        string     `json:"fullName"`
+	Email           string     `json:"email"`
+	Mobile          string     `json:"mobile"`
+	Company         string     `json:"company"`
+	IsActive        int        `json:"isActive"`
+	Type            string     `json:"type"`
+	RoleID          uint       `json:"roleId"`
+	IsAllBU         int        `json:"isAllBu"`
+	ProfileImage    string     `json:"profileImage"`
 	EmailVerifiedAt *time.Time `json:"emailVerifiedAt"`
 	CreatedAt       time.Time  `json:"createdAt"`
 	UpdatedAt       time.Time  `json:"updatedAt"`
