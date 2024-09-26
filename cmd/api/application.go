@@ -2,6 +2,7 @@ package api
 
 import (
 	"go-ibooking/internal/config"
+	"go-ibooking/internal/events"
 	"go-ibooking/internal/infrastructure/cache"
 	"go-ibooking/internal/infrastructure/datastore"
 	"go-ibooking/internal/infrastructure/logger"
@@ -47,6 +48,10 @@ func (app *application) Fiber() *fiber.App {
 	return app.fiber
 }
 
+func (app *application) Config() *config.Config {
+	return app.cfg
+}
+
 func (app *application) Boot() {
 	app.loadLogger()
 	app.loadRouter()
@@ -64,17 +69,26 @@ func (app *application) loadLogger() {
 	logger.NewInitializeLogger(app.cfg)
 }
 
+func (app *application) registryListener() events.EventListener {
+	mailer := mailer.NewMailer(app.cfg)
+	listener := events.NewEventListener(mailer)
+
+	go listener.Listen()
+
+	return listener
+}
+
 func (app *application) setupRegistry() registry.Registry {
 	db := datastore.NewPgDatastore(app.cfg)
 	redis := datastore.NewRedisDatastore(app.cfg)
 	s3 := datastore.NewS3Datastore(app.cfg)
 	recaptcha := recaptcha.NewRecaptchaProvider(app.cfg)
-	mailer := mailer.NewMailer(app.cfg)
 	cfg := app.cfg
+	listener := app.registryListener()
 
 	cacheManager := cache.NewCacheManager(redis.Client, 5*time.Minute)
 
-	return registry.NewRegistry(db, redis.Client, s3, cfg, recaptcha, mailer, cacheManager)
+	return registry.NewRegistry(db, redis.Client, s3, cfg, recaptcha, cacheManager, listener)
 }
 
 func (app *application) listen() {

@@ -8,5 +8,6 @@ func (r *registry) RegisterUsersInteractor() i.UsersInteractor {
 	return i.NewUsersInteractor(
 		r.NewUsersRepository(),
 		r.s3,
+		r.listener,
 	)
 }

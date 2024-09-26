@@ -27,6 +27,7 @@ require (
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/robfig/cron v1.2.0 // indirect
 	go.mongodb.org/mongo-driver v1.13.1 // indirect
+	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/driver/mysql v1.5.6 // indirect
 )
@@ -96,6 +97,7 @@ require (
 	golang.org/x/sys v0.25.0 // indirect
 	golang.org/x/text v0.18.0 // indirect
 	golang.org/x/tools v0.24.0 // indirect
+	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	gorm.io/datatypes v1.2.1
 )

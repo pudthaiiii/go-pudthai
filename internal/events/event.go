@@ -1,17 +1,20 @@
 package events
 
-import "fmt"
+import "go-ibooking/internal/infrastructure/mailer"
 
 type Event struct {
 	Name string
 	Data interface{}
 }
 
+var mail *mailer.Mailer
+
 // EventListener เป็น channel ที่ใช้รับเหตุการณ์
 type EventListener chan Event
 
 // NewEventListener สร้าง event listener ใหม่
-func NewEventListener() EventListener {
+func NewEventListener(mailer *mailer.Mailer) EventListener {
+	mail = mailer
 	return make(EventListener)
 }
 
@@ -19,10 +22,10 @@ func NewEventListener() EventListener {
 func (el EventListener) Listen() {
 	for event := range el {
 		switch event.Name {
-		case "user_login":
-			userLoginHandler(event.Data)
+		case "create_user_email":
+			createUserEmail(event.Data)
 		default:
-			fmt.Printf("Received event: %s with data: %v\n", event.Name, event.Data)
+			// fmt.Printf("Received event: %s with data: %v\n", event.Name, event.Data)
 		}
 	}
 }

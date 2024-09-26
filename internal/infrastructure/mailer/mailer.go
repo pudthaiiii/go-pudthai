@@ -34,6 +34,8 @@ func NewMailer(cfg *config.Config) *Mailer {
 }
 
 func (e *Mailer) renderTemplate(templateFile string, data map[string]interface{}) (string, error) {
+	templateFile = templateFile + ".html"
+
 	tmpl, err := template.ParseFiles(e.TemplateDir + "/" + templateFile)
 	if err != nil {
 		return "", err
@@ -48,11 +50,11 @@ func (e *Mailer) renderTemplate(templateFile string, data map[string]interface{}
 }
 
 func (e *Mailer) SendEmail(subject, templateFile string, data map[string]interface{}, toEmail string, bccEmails ...string) error {
-	body, err := e.renderTemplate(templateFile, data)
-	if err != nil {
-		logger.Log.Err(err).Msg("failed to render template")
-		return fmt.Errorf("failed to render template: %w", err)
-	}
+	// body, err := e.renderTemplate(templateFile, data)
+	// if err != nil {
+	// 	logger.Log.Err(err).Msg("failed to render template")
+	// 	return fmt.Errorf("failed to render template: %w", err)
+	// }
 
 	auth := smtp.PlainAuth("", e.username, e.password, e.smtpServer)
 
@@ -64,17 +66,35 @@ func (e *Mailer) SendEmail(subject, templateFile string, data map[string]interfa
 	msg := []byte(
 		fmt.Sprintf(
 			"From: %s\nTo: %s\nBcc: %s\nSubject: %s\nContent-Type: text/html; charset=\"UTF-8\"\n\n%s",
-			e.fromAddress, toEmail, formatBCC(bccEmails), subject, body,
+			e.fromAddress, toEmail, formatBCC(bccEmails), subject, "<h1>hello</h1>",
 		),
 	)
 
-	send := e.getSendFunction()
+	fmt.Println(e.smtpServer, e.smtpPort, e.username, e.password, e.fromAddress, e.encryption, e.TemplateDir)
+	sendErr := smtp.SendMail(
+		e.smtpServer+":"+e.smtpPort,
+		auth,
+		e.fromAddress,
+		recipients,
+		msg,
+	)
 
-	err = send(auth, recipients, msg)
-	if err != nil {
-		logger.Log.Err(err).Msg("failed to send email")
-		return fmt.Errorf("failed to send email: %w", err)
+	if sendErr != nil {
+		logger.Log.Err(sendErr).Msg("failed to send email")
+		return fmt.Errorf("failed to send email: %w", sendErr)
 	}
+
+	fmt.Println(auth, recipients, msg)
+
+	// send := e.getSendFunction()
+
+	// err = send(auth, recipients, msg)
+	// if err != nil {
+	// 	logger.Log.Err(err).Msg("failed to send email")
+	// 	return fmt.Errorf("failed to send email: %w", err)
+	// }
+
+	logger.Write.Info().Msg("Email sent successfully")
 
 	return nil
 }
@@ -88,6 +108,7 @@ func formatBCC(bccEmails []string) string {
 }
 
 func (e *Mailer) getSendFunction() func(auth smtp.Auth, recipients []string, msg []byte) error {
+	fmt.Println(e.encryption)
 	switch strings.ToLower(e.encryption) {
 	case "tls":
 		return e.sendEmailTLS
