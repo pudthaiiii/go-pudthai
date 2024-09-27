@@ -1,36 +1,42 @@
 package events
 
-import "go-ibooking/internal/infrastructure/mailer"
+import (
+	"go-ibooking/internal/infrastructure/cache"
+	"go-ibooking/internal/infrastructure/mailer"
+
+	"gorm.io/gorm"
+)
+
+var (
+	mail *mailer.Mailer
+	// db    *gorm.DB
+//  cacheManager *cache.CacheManager
+)
+
+type EventListener chan Event
 
 type Event struct {
 	Name string
 	Data interface{}
 }
 
-var mail *mailer.Mailer
-
-// EventListener เป็น channel ที่ใช้รับเหตุการณ์
-type EventListener chan Event
-
-// NewEventListener สร้าง event listener ใหม่
-func NewEventListener(mailer *mailer.Mailer) EventListener {
+func NewEventListener(mailer *mailer.Mailer, dbConn *gorm.DB, cache *cache.CacheManager) EventListener {
 	mail = mailer
+	// cacheManager = cache
+	// db = dbConn
+
 	return make(EventListener)
 }
 
-// Listen ฟังก์ชันที่รอรับเหตุการณ์
 func (el EventListener) Listen() {
 	for event := range el {
 		switch event.Name {
-		case "create_user_email":
-			createUserEmail(event.Data)
-		default:
-			// fmt.Printf("Received event: %s with data: %v\n", event.Name, event.Data)
+		case "user.created":
+			userCreated(event.Data)
 		}
 	}
 }
 
-// Emit ส่งเหตุการณ์ไปยัง listener
 func Emit(el EventListener, name string, data interface{}) {
 	el <- Event{Name: name, Data: data}
 }

@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 type application struct {
@@ -69,9 +70,9 @@ func (app *application) loadLogger() {
 	logger.NewInitializeLogger(app.cfg)
 }
 
-func (app *application) registryListener() events.EventListener {
+func (app *application) registryListener(db *gorm.DB, cacheManager *cache.CacheManager) events.EventListener {
 	mailer := mailer.NewMailer(app.cfg)
-	listener := events.NewEventListener(mailer)
+	listener := events.NewEventListener(mailer, db, cacheManager)
 
 	go listener.Listen()
 
@@ -79,14 +80,14 @@ func (app *application) registryListener() events.EventListener {
 }
 
 func (app *application) setupRegistry() registry.Registry {
-	db := datastore.NewPgDatastore(app.cfg)
-	redis := datastore.NewRedisDatastore(app.cfg)
 	s3 := datastore.NewS3Datastore(app.cfg)
-	recaptcha := recaptcha.NewRecaptchaProvider(app.cfg)
+	db := datastore.NewPgDatastore(app.cfg)
 	cfg := app.cfg
-	listener := app.registryListener()
-
+	redis := datastore.NewRedisDatastore(app.cfg)
+	recaptcha := recaptcha.NewRecaptchaProvider(app.cfg)
 	cacheManager := cache.NewCacheManager(redis.Client, 5*time.Minute)
+
+	listener := app.registryListener(db, cacheManager)
 
 	return registry.NewRegistry(db, redis.Client, s3, cfg, recaptcha, cacheManager, listener)
 }

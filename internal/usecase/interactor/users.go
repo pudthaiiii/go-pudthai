@@ -23,10 +23,6 @@ type usersInteractor struct {
 	listener events.EventListener
 }
 
-type UsersInteractor interface {
-	Create(ctx context.Context, dto dtos.CreateUser, avatar *multipart.FileHeader) (dtos.ResponseUserID, error)
-}
-
 func NewUsersInteractor(userRepo repository.UsersRepository, s3 *datastore.S3Datastore, listener events.EventListener) UsersInteractor {
 	return &usersInteractor{
 		userRepo,
@@ -35,14 +31,16 @@ func NewUsersInteractor(userRepo repository.UsersRepository, s3 *datastore.S3Dat
 	}
 }
 
+type UsersInteractor interface {
+	Create(ctx context.Context, dto dtos.CreateUser, avatar *multipart.FileHeader) (dtos.ResponseUserID, error)
+}
+
 func (u *usersInteractor) Create(ctx context.Context, dto dtos.CreateUser, file *multipart.FileHeader) (dtos.ResponseUserID, error) {
 	var (
 		createUser dtos.ResponseUserID
 		fileName   string
 	)
-	events.Emit(u.listener, "create_user_email", nil)
 
-	return createUser, nil
 	existingUser, err := u.userRepo.FindUserByEmail(ctx, dto.Email, "")
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -69,9 +67,9 @@ func (u *usersInteractor) Create(ctx context.Context, dto dtos.CreateUser, file 
 		return createUser, throw.UserCreate(err)
 	}
 
-	events.Emit(u.listener, "create_user_email", user)
-
 	copier.Copy(&createUser, &user)
+
+	events.Emit(u.listener, "user.created", user)
 
 	return createUser, nil
 }

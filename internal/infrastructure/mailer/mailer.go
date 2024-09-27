@@ -7,8 +7,10 @@ import (
 	"go-ibooking/internal/config"
 	"go-ibooking/internal/infrastructure/logger"
 	"html/template"
-	"net/smtp"
+	"strconv"
 	"strings"
+
+	"gopkg.in/gomail.v2"
 )
 
 type Mailer struct {
@@ -33,7 +35,7 @@ func NewMailer(cfg *config.Config) *Mailer {
 	}
 }
 
-func (e *Mailer) renderTemplate(templateFile string, data map[string]interface{}) (string, error) {
+func (e *Mailer) renderTemplate(templateFile string, data any) (string, error) {
 	templateFile = templateFile + ".html"
 
 	tmpl, err := template.ParseFiles(e.TemplateDir + "/" + templateFile)
@@ -49,140 +51,46 @@ func (e *Mailer) renderTemplate(templateFile string, data map[string]interface{}
 	return buf.String(), nil
 }
 
-func (e *Mailer) SendEmail(subject, templateFile string, data map[string]interface{}, toEmail string, bccEmails ...string) error {
-	// body, err := e.renderTemplate(templateFile, data)
-	// if err != nil {
-	// 	logger.Log.Err(err).Msg("failed to render template")
-	// 	return fmt.Errorf("failed to render template: %w", err)
-	// }
+func (e *Mailer) Send(subject, templateFile string, data any, toEmail string, bccEmails ...string) error {
+	body, err := e.renderTemplate(templateFile, data)
+	if err != nil {
+		logger.Log.Err(err).Msg("failed to render template")
+		return fmt.Errorf("failed to render template: %w", err)
+	}
 
-	auth := smtp.PlainAuth("", e.username, e.password, e.smtpServer)
+	m := gomail.NewMessage()
 
-	recipients := []string{toEmail}
+	m.SetHeader("From", e.fromAddress)
+	m.SetHeader("To", toEmail)
+	m.SetHeader("Subject", subject)
+	m.SetBody("text/html", body)
+
 	if len(bccEmails) > 0 {
-		recipients = append(recipients, bccEmails...)
+		m.SetHeader("Bcc", bccEmails...)
 	}
 
-	msg := []byte(
-		fmt.Sprintf(
-			"From: %s\nTo: %s\nBcc: %s\nSubject: %s\nContent-Type: text/html; charset=\"UTF-8\"\n\n%s",
-			e.fromAddress, toEmail, formatBCC(bccEmails), subject, "<h1>hello</h1>",
-		),
-	)
-
-	fmt.Println(e.smtpServer, e.smtpPort, e.username, e.password, e.fromAddress, e.encryption, e.TemplateDir)
-	sendErr := smtp.SendMail(
-		e.smtpServer+":"+e.smtpPort,
-		auth,
-		e.fromAddress,
-		recipients,
-		msg,
-	)
-
-	if sendErr != nil {
-		logger.Log.Err(sendErr).Msg("failed to send email")
-		return fmt.Errorf("failed to send email: %w", sendErr)
+	port, err := strconv.Atoi(e.smtpPort)
+	if err != nil {
+		logger.Log.Err(err).Msg("invalid SMTP port")
+		return fmt.Errorf("invalid SMTP port: %w", err)
 	}
 
-	fmt.Println(auth, recipients, msg)
+	d := gomail.NewDialer(
+		e.smtpServer,
+		port,
+		e.username,
+		e.password,
+	)
 
-	// send := e.getSendFunction()
+	if strings.ToLower(e.encryption) == "tls" {
+		d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+	}
 
-	// err = send(auth, recipients, msg)
-	// if err != nil {
-	// 	logger.Log.Err(err).Msg("failed to send email")
-	// 	return fmt.Errorf("failed to send email: %w", err)
-	// }
+	if err := d.DialAndSend(m); err != nil {
+		logger.Log.Err(err).Msg("failed to send email")
+		return err
+	}
 
 	logger.Write.Info().Msg("Email sent successfully")
-
-	return nil
-}
-
-func formatBCC(bccEmails []string) string {
-	if len(bccEmails) == 0 {
-		return ""
-	}
-
-	return fmt.Sprintf("%s", bccEmails)
-}
-
-func (e *Mailer) getSendFunction() func(auth smtp.Auth, recipients []string, msg []byte) error {
-	fmt.Println(e.encryption)
-	switch strings.ToLower(e.encryption) {
-	case "tls":
-		return e.sendEmailTLS
-	default:
-		return e.sendEmailPlain
-	}
-}
-
-func (e *Mailer) sendEmailPlain(auth smtp.Auth, recipients []string, msg []byte) error {
-	return smtp.SendMail(
-		e.smtpServer+":"+e.smtpPort,
-		auth,
-		e.fromAddress,
-		recipients,
-		msg,
-	)
-}
-
-func (e *Mailer) sendEmailTLS(auth smtp.Auth, recipients []string, msg []byte) error {
-	tlsConfig := &tls.Config{
-		InsecureSkipVerify: true,
-		ServerName:         e.smtpServer,
-	}
-
-	conn, err := tls.Dial("tcp", e.smtpServer+":"+e.smtpPort, tlsConfig)
-	if err != nil {
-		logger.Log.Err(err).Msg("failed to dial TLS connection")
-		return fmt.Errorf("failed to dial TLS connection: %w", err)
-	}
-
-	client, err := smtp.NewClient(conn, e.smtpServer)
-	if err != nil {
-		logger.Log.Err(err).Msg("failed to create SMTP client")
-		return fmt.Errorf("failed to create SMTP client: %w", err)
-	}
-
-	defer client.Quit()
-	err = client.Auth(auth)
-	if err != nil {
-		logger.Log.Err(err).Msg("failed to authenticate")
-		return fmt.Errorf("failed to authenticate: %w", err)
-	}
-
-	err = client.Mail(e.fromAddress)
-	if err != nil {
-		logger.Log.Err(err).Msg("failed to set sender address")
-		return fmt.Errorf("failed to set sender address: %w", err)
-	}
-
-	for _, recipient := range recipients {
-		err = client.Rcpt(recipient)
-		if err != nil {
-			logger.Log.Err(err).Msg("failed to add recipient")
-			return fmt.Errorf("failed to add recipient: %w", err)
-		}
-	}
-
-	w, err := client.Data()
-	if err != nil {
-		logger.Log.Err(err).Msg("failed to create data writer")
-		return fmt.Errorf("failed to create data writer: %w", err)
-	}
-
-	_, err = w.Write(msg)
-	if err != nil {
-		logger.Log.Err(err).Msg("failed to write message")
-		return fmt.Errorf("failed to write message: %w", err)
-	}
-
-	err = w.Close()
-	if err != nil {
-		logger.Log.Err(err).Msg("failed to close data writer")
-		return fmt.Errorf("failed to close data writer: %w", err)
-	}
-
 	return nil
 }
