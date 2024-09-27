@@ -32,6 +32,8 @@ func (el EventListener) Listen() {
 	for event := range el {
 		switch event.Name {
 		case "user.created":
+		case "merchant.created":
+		case "admin.created":
 			userCreated(event.Data)
 		}
 	}

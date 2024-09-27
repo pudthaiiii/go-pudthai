@@ -80,6 +80,8 @@ func (c *Config) loadAppConfig() {
 		// JWT config
 		"JWT": map[string]interface{}{
 			"JwtSecret":               getEnv("JWT_SECRET"),
+			"JwtSecretAdmin":          getEnv("JWT_SECRET_ADMIN"),
+			"JwtSecretBackend":        getEnv("JWT_SECRET_BACKEND"),
 			"JwtAccessExpiresInHour":  getEnv("JWT_ACCESS_TOKEN_EXPIRES_IN_HOUR"),
 			"JwtRefreshExpiresInHour": getEnv("JWT_REFRESH_TOKEN_EXPIRES_IN_HOUR"),
 		},

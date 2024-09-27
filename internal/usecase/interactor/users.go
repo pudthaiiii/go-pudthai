@@ -4,12 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"go-ibooking/internal/enum"
 	"go-ibooking/internal/events"
 	"go-ibooking/internal/infrastructure/datastore"
 	"go-ibooking/internal/model/dtos"
 	"go-ibooking/internal/throw"
 	"go-ibooking/internal/usecase/repository"
 	"mime/multipart"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
@@ -39,9 +41,23 @@ func (u *usersInteractor) Create(ctx context.Context, dto dtos.CreateUser, file 
 	var (
 		createUser dtos.ResponseUserID
 		fileName   string
+		userType   string
+		merchantID uint
 	)
 
-	existingUser, err := u.userRepo.FindUserByEmail(ctx, dto.Email, "")
+	switch enum.UserTypeEnum(strings.ToUpper(dto.Type)) {
+	case enum.ADMIN:
+		userType = string(enum.ADMIN)
+		merchantID = 0
+	case enum.MERCHANT:
+		userType = string(enum.MERCHANT)
+		merchantID = 99
+	default:
+		userType = "User"
+		merchantID = 99
+	}
+
+	existingUser, err := u.userRepo.FindUserByEmail(ctx, dto.Email, userType)
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return createUser, throw.UserCreate(err)
@@ -62,14 +78,21 @@ func (u *usersInteractor) Create(ctx context.Context, dto dtos.CreateUser, file 
 		return createUser, throw.UserCreate(err)
 	}
 
-	user, err := u.userRepo.CreateAdminUser(ctx, dto, fileName, string(hashedPassword))
+	user, err := u.userRepo.CreateAdminUser(ctx, dto, fileName, string(hashedPassword), merchantID, userType)
 	if err != nil {
 		return createUser, throw.UserCreate(err)
 	}
 
 	copier.Copy(&createUser, &user)
 
-	events.Emit(u.listener, "user.created", user)
+	switch enum.UserTypeEnum(strings.ToUpper(dto.Type)) {
+	case enum.ADMIN:
+		events.Emit(u.listener, "admin.created", user)
+	case enum.MERCHANT:
+		events.Emit(u.listener, "merchant.created", user)
+	default:
+		events.Emit(u.listener, "user.created", user)
+	}
 
 	return createUser, nil
 }

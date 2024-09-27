@@ -2,7 +2,9 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"go-ibooking/internal/entities"
+	"go-ibooking/internal/enum"
 	"go-ibooking/internal/model/dtos"
 
 	"gorm.io/gorm"
@@ -17,11 +19,11 @@ func NewUsersRepository(db *gorm.DB) UsersRepository {
 }
 
 type UsersRepository interface {
-	CreateAdminUser(ctx context.Context, dto dtos.CreateUser, fileName string, password string) (entities.User, error)
+	CreateAdminUser(ctx context.Context, dto dtos.CreateUser, fileName string, password string, merchantID uint, userType string) (entities.User, error)
 	FindUserByEmail(ctx context.Context, email string, userType string) (entities.User, error)
 }
 
-func (r *usersRepository) CreateAdminUser(ctx context.Context, dto dtos.CreateUser, fileName string, password string) (entities.User, error) {
+func (r *usersRepository) CreateAdminUser(ctx context.Context, dto dtos.CreateUser, fileName string, password string, merchantID uint, userType string) (entities.User, error) {
 	var user = entities.User{
 		Email:        dto.Email,
 		Password:     string(password),
@@ -32,10 +34,15 @@ func (r *usersRepository) CreateAdminUser(ctx context.Context, dto dtos.CreateUs
 		FullName:     dto.FullName,
 		Mobile:       dto.Mobile,
 		Company:      dto.Company,
-		Type:         dto.Type,
-		MerchantID:   1,
+		Type:         userType,
 	}
 
+	fmt.Println("userType", userType, dto.Type, string(enum.ADMIN))
+	if userType != string(enum.ADMIN) {
+		user.MerchantID = merchantID
+	}
+
+	fmt.Println("user", user)
 	query := r.db.WithContext(ctx).Create(&user)
 	if query.Error != nil {
 		return user, query.Error

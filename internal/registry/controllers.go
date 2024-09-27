@@ -5,6 +5,11 @@ import (
 )
 
 // UsersController
-func (r *registry) RegisterUsersController() c.UsersController {
-	return c.NewUsersController(r.RegisterUsersInteractor())
+func (r *registry) NewUsersController() c.UsersController {
+	return c.NewUsersController(r.NewUsersInteractor())
+}
+
+// AuthController
+func (r *registry) NewAuthController() c.AuthController {
+	return c.NewAuthController(r.NewAuthInteractor())
 }

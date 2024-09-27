@@ -1,78 +1,124 @@
 package interactor
 
-// import (
-// 	"context"
-// 	"fmt"
-// 	"go-ibooking/internal/entities"
-// 	"go-ibooking/internal/throw"
-// 	"go-ibooking/internal/utils"
-// 	"os"
+import (
+	"context"
+	"fmt"
+	"go-ibooking/internal/config"
+	"go-ibooking/internal/infrastructure/cache"
+	"go-ibooking/internal/model/dtos"
+	"go-ibooking/internal/throw"
+	"go-ibooking/internal/usecase/repository"
+	"time"
 
-// 	"golang.org/x/crypto/bcrypt"
-// 	"gorm.io/gorm"
-// )
+	"github.com/golang-jwt/jwt"
+	"golang.org/x/crypto/bcrypt"
+)
 
-// type authService struct {
-// 	usersRepo    *gorm.DB
-// 	usersService UsersService
-// }
+type authInteractor struct {
+	userRepo     repository.UsersRepository
+	cacheManager *cache.CacheManager
+	cfg          *config.Config
+}
 
-// type AuthService interface {
-// 	Login(ctx context.Context, dto dtoReq.Login) (dtoRes.Create, error)
-// }
+func NewAuthInteractor(usersRepo repository.UsersRepository, cacheManager *cache.CacheManager, cfg *config.Config) AuthInteractor {
+	return &authInteractor{
+		usersRepo,
+		cacheManager,
+		cfg,
+	}
+}
 
-// func NewAuthService(usersRepo *gorm.DB, usersService UsersService) AuthService {
-// 	return &authService{
-// 		usersRepo,
-// 		usersService,
-// 	}
-// }
+type AuthInteractor interface {
+	Login(ctx context.Context, dto dtos.Login, userType string) (dtos.AuthJWT, error)
+}
 
-// // Create new user
-// func (s *authService) Login(ctx context.Context, dto dtoReq.Login) (dtoRes.Create, error) {
-// 	user, userErr := s.usersService.FindUserByEmail(ctx, dto.Email)
-// 	if userErr != nil {
-// 		return dtoRes.Create{}, userErr
-// 	}
+// Create new user
+func (s *authInteractor) Login(ctx context.Context, dto dtos.Login, userType string) (dtos.AuthJWT, error) {
+	user, userErr := s.userRepo.FindUserByEmail(ctx, dto.Email, userType)
+	if userErr != nil {
+		return dtos.AuthJWT{}, throw.UserCredentialMismatch()
+	}
 
-// 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(dto.Password)); err != nil {
-// 		return dtoRes.Create{}, userErr
-// 	}
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(dto.Password)); err != nil {
+		return dtos.AuthJWT{}, throw.UserCredentialMismatch()
+	}
 
-// 	s.generateJwt(user)
+	payload := map[string]interface{}{
+		"user_id": user.ID,
+		"role":    "admin",
+	}
 
-// 	return dtoRes.Create{}, nil
-// }
+	_, errJwt := s.generateJwt(payload, userType)
+	if errJwt != nil {
+		return dtos.AuthJWT{}, throw.UserCredentialMismatch()
+	}
 
-// func (s *authService) generateJwt(user entities.User) error {
+	return dtos.AuthJWT{}, nil
+}
+
+func (s *authInteractor) generateJwt(payload map[string]interface{}, secret string) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"exp": time.Now().Add(time.Hour * 24).Unix(),
+		"iat": time.Now().Unix(),
+	})
+
+	claims := token.Claims.(jwt.MapClaims)
+
+	for key, value := range payload {
+		claims[key] = value
+	}
+
+	tokenString, err := token.SignedString([]byte(secret))
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Println(tokenString)
+
+	return tokenString, nil
+}
+
+// func (s *authInteractor) generateJwt(user entities.User, userType string) error {
 // 	var (
-// 		accessToken  string
-// 		refreshToken string
-// 		err          error
+// 		accessToken string
+// 		// refreshToken string
+// 		err    error
+// 		secret string
 // 	)
 
-// 	jwtAdminSecret := os.Getenv("JWT_ADMIN_SECRET")
-// 	accessExpiresIn := os.Getenv("JWT_ACCESS_TOKEN_EXPIRES_IN_HOUR")
-// 	refreshExpiresIn := os.Getenv("JWT_REFRESH_TOKEN_EXPIRES_IN_HOUR")
-
-// 	accessToken, err = utils.JwtSign(map[string]interface{}{
-// 		"userId": user.ID,
-// 		"email":  user.Email,
-// 	}, accessExpiresIn, jwtAdminSecret)
-// 	if err != nil {
-// 		return throw.Error(100001, err)
+// 	switch userType {
+// 	case string(enum.USER):
+// 		secret = s.cfg.Get("JWT")["JwtSecret"].(string)
+// 	case string(enum.ADMIN):
+// 		secret = s.cfg.Get("JWT")["JwtSecretAdmin"].(string)
+// 	case string(enum.MERCHANT):
+// 		secret = s.cfg.Get("JWT")["JwtSecretBackend"].(string)
 // 	}
 
-// 	refreshToken, err = utils.JwtSign(map[string]interface{}{
+// 	accessExpiresIn := s.cfg.Get("JWT")["AccessTokenExpiresInHour"].(string)
+// 	// refreshExpiresIn := s.cfg.Get("JWT")["JwtRefreshExpiresInHour"].(string)
+
+// 	payload := map[string]interface{}{
 // 		"userId": user.ID,
 // 		"email":  user.Email,
-// 	}, refreshExpiresIn, jwtAdminSecret)
-// 	if err != nil {
-// 		return throw.Error(100001, err)
+// 		"role":   userType,
 // 	}
+
+// 	accessToken, err = utils.JwtSign(payload, accessExpiresIn, secret)
+// 	if err != nil {
+// 		return throw.UserCredentialMismatch()
+// 	}
+
+// 	// refreshToken, err = utils.JwtSign(map[string]interface{}{
+// 	// 	"userId": user.ID,
+// 	// 	"email":  user.Email,
+// 	// }, refreshExpiresIn, secret)
+// 	// if err != nil {
+// 	// 	return throw.UserCredentialMismatch()
+// 	// }
 
 // 	fmt.Println(accessToken)
-// 	fmt.Println(refreshToken)
+// 	// fmt.Println(refreshToken)
 
 // 	return nil
 // }

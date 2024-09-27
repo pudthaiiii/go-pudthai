@@ -51,7 +51,8 @@ func NewRegistry(
 
 func (r *registry) NewController() controllers.AppController {
 	ac := controllers.AppController{
-		UsersController: r.RegisterUsersController(),
+		UsersController: r.NewUsersController(),
+		AuthController:  r.NewAuthController(),
 	}
 
 	return ac
@@ -59,7 +60,7 @@ func (r *registry) NewController() controllers.AppController {
 
 func (r *registry) NewConsoleController() cc.ConsoleController {
 	ac := cc.ConsoleController{
-		FeaturesController: r.RegisterFeaturesController(),
+		FeaturesController: r.NewFeaturesController(),
 	}
 
 	return ac

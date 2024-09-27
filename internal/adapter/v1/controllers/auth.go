@@ -1,44 +1,68 @@
 package controllers
 
-// import (
-// 	"go-ibooking/internal/validator"
-// 	"github.com/gofiber/fiber/v2"
-// )
+import (
+	"go-ibooking/internal/enum"
+	"go-ibooking/internal/model/dtos"
+	"go-ibooking/internal/usecase/interactor"
+	"go-ibooking/internal/validator"
 
-// type authController struct {
-// 	authService service.AuthService
-// }
+	"github.com/gofiber/fiber/v2"
+)
 
-// func NewAuthController(authService service.AuthService) AuthController {
-// 	return &authController{
-// 		authService,
-// 	}
-// }
+type authController struct {
+	authInteractor interactor.AuthInteractor
+}
 
-// type AuthController interface {
-// 	Login(c *fiber.Ctx) error
-// }
+func NewAuthController(authInteractor interactor.AuthInteractor) AuthController {
+	return &authController{
+		authInteractor,
+	}
+}
 
-// func (s authController) Login(c *fiber.Ctx) error {
-// 	req := dtos.Login{}
+type AuthController interface {
+	Login(c *fiber.Ctx) error
+	LoginAdmin(c *fiber.Ctx) error
+	LoginBackend(c *fiber.Ctx) error
+}
 
-// 	if errValidate := validator.Validate(c, &req); errValidate != nil {
-// 		return errValidate
-// 	}
+func (s authController) Login(c *fiber.Ctx) error {
+	req := dtos.Login{}
+	if errValidate := validator.Validate(c, &req); errValidate != nil {
+		return errValidate
+	}
 
-// 	result, err := s.authService.Login(c.Context(), req)
-// 	if err != nil {
-// 		return err
-// 	}
+	result, err := s.authInteractor.Login(c.Context(), req, string(enum.USER))
+	if err != nil {
+		return err
+	}
 
-// 	// tokenG := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-// 	// 	"userId": 1,
-// 	// 	"uuid":   "5a22cda8-141e-4237-b1a5-3cd7e4ad664d",
-// 	// 	"exp":    time.Now().Add(time.Minute * 5).Unix(),
-// 	// 	"iat":    time.Now().Unix(),
-// 	// })
+	return success(c, result, nil)
+}
 
-// 	// fmt.Println(tokenG.SignedString([]byte(os.Getenv("JWT_ADMIN_SECRET"))))
+func (s authController) LoginAdmin(c *fiber.Ctx) error {
+	req := dtos.Login{}
+	if errValidate := validator.Validate(c, &req); errValidate != nil {
+		return errValidate
+	}
 
-// 	return success(c, result, nil)
-// }
+	result, err := s.authInteractor.Login(c.Context(), req, string(enum.ADMIN))
+	if err != nil {
+		return err
+	}
+
+	return success(c, result, nil)
+}
+
+func (s authController) LoginBackend(c *fiber.Ctx) error {
+	req := dtos.Login{}
+	if errValidate := validator.Validate(c, &req); errValidate != nil {
+		return errValidate
+	}
+
+	result, err := s.authInteractor.Login(c.Context(), req, string(enum.MERCHANT))
+	if err != nil {
+		return err
+	}
+
+	return success(c, result, nil)
+}

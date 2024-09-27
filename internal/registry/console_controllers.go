@@ -5,6 +5,6 @@ import (
 )
 
 // NewPrototypeController
-func (r *registry) RegisterFeaturesController() console.FeaturesController {
+func (r *registry) NewFeaturesController() console.FeaturesController {
 	return console.NewFeaturesController(r.db)
 }

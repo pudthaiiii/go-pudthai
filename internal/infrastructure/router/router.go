@@ -26,7 +26,7 @@ func initializeRoute(app *fiber.App, c controllers.AppController) *fiber.App {
 	prefix := app.Group("/v1")
 
 	routes = append(routes, addUsersRoute(c.UsersController)...)
-	// routes = append(routes, addAuthRoute(c.AuthController)...)
+	routes = append(routes, addAuthRoute(c.AuthController)...)
 
 	for _, route := range routes {
 		handler := route.HandlerFunc
