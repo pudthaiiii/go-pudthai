@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"go-ibooking/internal/adapter/shared"
 	"go-ibooking/internal/adapter/v1/admin/dtos"
 	"go-ibooking/internal/enum"
@@ -26,6 +27,8 @@ type AuthController interface {
 }
 
 func (s authController) Login(c *fiber.Ctx) error {
+
+	fmt.Println("incontrol ", c.Locals("Merchant"))
 	req := dtos.Login{}
 	if errValidate := validator.Validate(c, &req); errValidate != nil {
 		return errValidate

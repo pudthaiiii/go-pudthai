@@ -2,10 +2,10 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"go-ibooking/internal/entities"
 	"go-ibooking/internal/enum"
 	"go-ibooking/internal/model/dtos"
+	"strconv"
 
 	"gorm.io/gorm"
 )
@@ -37,12 +37,18 @@ func (r *usersRepository) CreateAdminUser(ctx context.Context, dto dtos.CreateUs
 		Type:         userType,
 	}
 
-	fmt.Println("userType", userType, dto.Type, string(enum.ADMIN))
 	if userType != string(enum.ADMIN) {
-		user.MerchantID = merchantID
+		merchantID, ok := ctx.Value("MerchantID").(string)
+		if ok {
+			merchantIDUint, err := strconv.ParseUint(merchantID, 10, 32)
+			if err != nil {
+				return user, err
+			}
+
+			user.MerchantID = uint(merchantIDUint)
+		}
 	}
 
-	fmt.Println("user", user)
 	query := r.db.WithContext(ctx).Create(&user)
 	if query.Error != nil {
 		return user, query.Error
@@ -58,6 +64,11 @@ func (r *usersRepository) FindUserByEmail(ctx context.Context, email string, use
 
 	if userType != "" {
 		query = query.Where("type = ?", userType)
+	}
+
+	merchantID, ok := ctx.Value("MerchantID").(string)
+	if ok {
+		query = query.Where("merchant_id = ?", merchantID)
 	}
 
 	err := query.Preload("Role").First(&user).Error

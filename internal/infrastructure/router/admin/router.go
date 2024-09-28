@@ -2,13 +2,14 @@ package router
 
 import (
 	_ "go-ibooking/docs"
-	ca "go-ibooking/internal/adapter/v1/admin/controllers"
+	smm "go-ibooking/internal/adapter/shared/middleware"
+	ac "go-ibooking/internal/adapter/v1/admin/controllers"
 	t "go-ibooking/internal/model/technical"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func InitializeAdminRoute(app *fiber.App, c ca.AdminController) *fiber.App {
+func InitializeAdminRoute(app *fiber.App, c ac.AdminController, sm smm.Middleware) *fiber.App {
 	var routes = t.Routes{}
 	prefix := app.Group("/v1/admin")
 
@@ -17,7 +18,9 @@ func InitializeAdminRoute(app *fiber.App, c ca.AdminController) *fiber.App {
 
 	for _, route := range routes {
 		handler := route.HandlerFunc
-		// handler = m.Authenticate(handler, route.Action, route.Subject)
+
+		handler = sm.Authenticate(handler, route.Action, route.Subject)
+		handler = sm.RequiredMerchant(handler, route.Action, route.Subject)
 
 		prefix.Name(route.Name)
 		prefix.Add(route.Method, route.Path, handler)
