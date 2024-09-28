@@ -1,19 +1,20 @@
 package controllers
 
 import (
+	"go-ibooking/internal/adapter/shared"
+	"go-ibooking/internal/adapter/v1/admin/dtos"
 	"go-ibooking/internal/enum"
-	"go-ibooking/internal/model/dtos"
-	i "go-ibooking/internal/usecase/interactor/shared"
+	is "go-ibooking/internal/usecase/interactor/shared"
 	"go-ibooking/internal/validator"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type authController struct {
-	authInteractor i.SharedAuthInteractor
+	authInteractor is.SharedAuthInteractor
 }
 
-func NewAuthController(authInteractor i.SharedAuthInteractor) AuthController {
+func NewAuthController(authInteractor is.SharedAuthInteractor) AuthController {
 	return &authController{
 		authInteractor,
 	}
@@ -21,7 +22,7 @@ func NewAuthController(authInteractor i.SharedAuthInteractor) AuthController {
 
 type AuthController interface {
 	Login(c *fiber.Ctx) error
-	LoginBackend(c *fiber.Ctx) error
+	Refresh(c *fiber.Ctx) error
 }
 
 func (s authController) Login(c *fiber.Ctx) error {
@@ -30,24 +31,24 @@ func (s authController) Login(c *fiber.Ctx) error {
 		return errValidate
 	}
 
-	result, err := s.authInteractor.Login(c.Context(), req, string(enum.USER))
+	result, err := s.authInteractor.Login(c.Context(), req, string(enum.ADMIN))
 	if err != nil {
 		return err
 	}
 
-	return Success(c, result, nil)
+	return shared.Success(c, result, nil)
 }
 
-func (s authController) LoginBackend(c *fiber.Ctx) error {
-	req := dtos.Login{}
+func (s authController) Refresh(c *fiber.Ctx) error {
+	req := dtos.Refresh{}
 	if errValidate := validator.Validate(c, &req); errValidate != nil {
 		return errValidate
 	}
 
-	result, err := s.authInteractor.Login(c.Context(), req, string(enum.MERCHANT))
+	result, err := s.authInteractor.Refresh(c.Context(), req, string(enum.ADMIN))
 	if err != nil {
 		return err
 	}
 
-	return Success(c, result, nil)
+	return shared.Success(c, result, nil)
 }

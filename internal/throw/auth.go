@@ -7,3 +7,7 @@ func UserCredentialMismatch() error {
 func GenerateJwtTokenError(err error) error {
 	return Error(100002, err)
 }
+
+func InvalidJwtToken(err error) error {
+	return Error(100003, err)
+}

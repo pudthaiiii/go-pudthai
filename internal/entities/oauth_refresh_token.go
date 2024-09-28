@@ -10,6 +10,6 @@ type OauthRefreshToken struct {
 	gorm.Model
 	Token              string `gorm:"unique;not null"`
 	ExpiresAt          *time.Time
-	OAuthAccessTokenID uint             `gorm:"index"`
-	OAuthAccessToken   OauthAccessToken `gorm:"foreignKey:OAuthAccessTokenID;references:ID"`
+	OauthAccessTokenID uint             `gorm:"index"`
+	OauthAccessToken   OauthAccessToken `gorm:"foreignKey:OauthAccessTokenID;references:ID"`
 }

@@ -85,11 +85,11 @@ func (app *application) setupRegistry() registry.Registry {
 	cfg := app.cfg
 	redis := datastore.NewRedisDatastore(app.cfg)
 	recaptcha := recaptcha.NewRecaptchaProvider(app.cfg)
-	cacheManager := cache.NewCacheManager(redis.Client, 5*time.Minute)
 
+	cacheManager := cache.NewCacheManager(redis.Client, 5*time.Minute)
 	listener := app.registryListener(db, cacheManager)
 
-	return registry.NewRegistry(db, redis.Client, s3, cfg, recaptcha, cacheManager, listener)
+	return registry.NewRegistry(db, s3, cfg, recaptcha, cacheManager, listener)
 }
 
 func (app *application) listen() {

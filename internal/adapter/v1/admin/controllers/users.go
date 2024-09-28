@@ -1,18 +1,19 @@
 package controllers
 
 import (
+	"go-ibooking/internal/adapter/shared"
 	"go-ibooking/internal/model/dtos"
-	"go-ibooking/internal/usecase/interactor"
+	ia "go-ibooking/internal/usecase/interactor/admin"
 	"go-ibooking/internal/validator"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type usersController struct {
-	userInteractor interactor.UsersInteractor
+	userInteractor ia.UsersInteractor
 }
 
-func NewUsersController(userInteractor interactor.UsersInteractor) UsersController {
+func NewUsersController(userInteractor ia.UsersInteractor) UsersController {
 	return &usersController{
 		userInteractor,
 	}
@@ -46,5 +47,5 @@ func (u usersController) Create(c *fiber.Ctx) error {
 		return err
 	}
 
-	return Success(c, result, nil)
+	return shared.Success(c, result, nil)
 }

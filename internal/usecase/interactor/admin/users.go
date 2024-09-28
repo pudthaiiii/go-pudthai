@@ -19,25 +19,25 @@ import (
 	"gorm.io/gorm"
 )
 
-type adminUsersInteractor struct {
+type usersInteractor struct {
 	userRepo repository.UsersRepository
 	s3       *datastore.S3Datastore
 	listener events.EventListener
 }
 
-func NewAdminUsersInteractor(userRepo repository.UsersRepository, s3 *datastore.S3Datastore, listener events.EventListener) AdminUsersInteractor {
-	return &adminUsersInteractor{
+func NewUsersInteractor(userRepo repository.UsersRepository, s3 *datastore.S3Datastore, listener events.EventListener) UsersInteractor {
+	return &usersInteractor{
 		userRepo,
 		s3,
 		listener,
 	}
 }
 
-type AdminUsersInteractor interface {
+type UsersInteractor interface {
 	Create(ctx context.Context, dto dtos.CreateUser, avatar *multipart.FileHeader) (dtos.ResponseUserID, error)
 }
 
-func (u *adminUsersInteractor) Create(ctx context.Context, dto dtos.CreateUser, file *multipart.FileHeader) (dtos.ResponseUserID, error) {
+func (u *usersInteractor) Create(ctx context.Context, dto dtos.CreateUser, file *multipart.FileHeader) (dtos.ResponseUserID, error) {
 	var createUser dtos.ResponseUserID
 
 	userType, merchantID := resolveUserTypeAndMerchantID(dto.Type)
@@ -81,7 +81,7 @@ func resolveUserTypeAndMerchantID(userType string) (string, uint) {
 	}
 }
 
-func (u *adminUsersInteractor) handleFileUpload(ctx context.Context, file *multipart.FileHeader) (string, error) {
+func (u *usersInteractor) handleFileUpload(ctx context.Context, file *multipart.FileHeader) (string, error) {
 	if file == nil {
 		return "", nil
 	}
@@ -97,7 +97,7 @@ func hashPassword(password string) (string, error) {
 	return string(hashedPassword), err
 }
 
-func (u *adminUsersInteractor) emitUserCreatedEvent(userType string, user interface{}) {
+func (u *usersInteractor) emitUserCreatedEvent(userType string, user interface{}) {
 	switch enum.UserTypeEnum(strings.ToUpper(userType)) {
 	case enum.ADMIN:
 		events.Emit(u.listener, "admin.created", user)

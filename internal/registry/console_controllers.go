@@ -1,10 +1,10 @@
 package registry
 
 import (
-	console "go-ibooking/internal/adapter/v1/controllers/console"
+	cc "go-ibooking/internal/adapter/console/controllers"
 )
 
 // NewPrototypeController
-func (r *registry) NewFeaturesController() console.FeaturesController {
-	return console.NewFeaturesController(r.db)
+func (r *registry) NewConsoleDatabaseController() cc.DatabaseController {
+	return cc.NewDatabaseController(r.db)
 }

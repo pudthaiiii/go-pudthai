@@ -9,21 +9,21 @@ import (
 	logger "go-ibooking/internal/infrastructure/logger"
 )
 
-type featuresController struct {
+type dbController struct {
 	db *gorm.DB
 }
 
-func NewFeaturesController(db *gorm.DB) FeaturesController {
-	return &featuresController{
+func NewDatabaseController(db *gorm.DB) DatabaseController {
+	return &dbController{
 		db: db,
 	}
 }
 
-type FeaturesController interface {
+type DatabaseController interface {
 	AutoMigrate(c *fiber.Ctx) error
 }
 
-func (s featuresController) AutoMigrate(c *fiber.Ctx) error {
+func (s dbController) AutoMigrate(c *fiber.Ctx) error {
 	if err := s.db.AutoMigrate(
 		&entities.Merchant{},
 		&entities.User{},

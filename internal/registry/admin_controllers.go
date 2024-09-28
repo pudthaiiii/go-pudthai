@@ -1,7 +1,7 @@
 package registry
 
 import (
-	c "go-ibooking/internal/adapter/v1/controllers/admin"
+	c "go-ibooking/internal/adapter/v1/admin/controllers"
 )
 
 // AuthController
@@ -10,5 +10,5 @@ func (r *registry) NewAdminAuthController() c.AuthController {
 }
 
 func (r *registry) NewAdminUsersController() c.UsersController {
-	return c.NewUsersController(r.NewUsersInteractor())
+	return c.NewUsersController(r.NewAdminUsersInteractor())
 }

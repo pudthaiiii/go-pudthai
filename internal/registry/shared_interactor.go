@@ -8,6 +8,7 @@ func (r *registry) NewSharedAuthInteractor() i.SharedAuthInteractor {
 	return i.NewSharedAuthInteractor(
 		r.NewUsersRepository(),
 		r.NewOauthAccessTokenRepository(),
+		r.NewOauthRefreshTokenRepository(),
 		r.cacheManager,
 		r.cfg,
 	)

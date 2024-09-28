@@ -2,7 +2,7 @@ package router
 
 import (
 	_ "go-ibooking/docs"
-	ca "go-ibooking/internal/adapter/v1/controllers/admin"
+	ca "go-ibooking/internal/adapter/v1/admin/controllers"
 	t "go-ibooking/internal/model/technical"
 
 	"github.com/gofiber/fiber/v2"

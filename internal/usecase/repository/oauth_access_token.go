@@ -58,7 +58,7 @@ func (r *oauthAccessTokenRepository) CreateTransaction(ctx context.Context, user
 		refreshToken = entities.OauthRefreshToken{
 			Token:              newRefreshUUID.String(),
 			ExpiresAt:          &refreshExpiredAt,
-			OAuthAccessTokenID: accessToken.ID,
+			OauthAccessTokenID: accessToken.ID,
 		}
 
 		if err := tx.WithContext(ctx).Create(&refreshToken).Error; err != nil {

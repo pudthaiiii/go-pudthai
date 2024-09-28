@@ -1,21 +1,24 @@
 package router
 
 import (
-	controller "go-ibooking/internal/adapter/v1/controllers/console"
+	cc "go-ibooking/internal/adapter/console/controllers"
+	cm "go-ibooking/internal/adapter/console/middleware"
 	"go-ibooking/internal/model/technical"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func InitializeConsoleRoute(app *fiber.App, c controller.FeaturesController) *fiber.App {
-	var routes = technical.Routes{}
-	prefix := app.Group("/v1/console")
+func InitializeConsoleRoute(app *fiber.App, c cc.ConsoleController, m cm.Middleware) *fiber.App {
+	prefix := app.Group("/console")
 
-	routes = append(routes, addFeaturesRoute(c)...)
+	var routes = technical.Routes{}
+	routes = append(routes, addDatabaseRoute(c.DatabaseController)...)
 
 	for _, route := range routes {
 		handler := route.HandlerFunc
 		prefix.Name(route.Name)
+
+		handler = m.CookieAuthenticate(handler, route.Action, route.Subject)
 
 		prefix.Add(route.Method, route.Path, handler)
 	}

@@ -1,14 +1,18 @@
 package permission
 
+type Action string
+type Subject string
+
 const (
-	None   = "none"
-	View   = "view"
-	Manage = "Manage"
+	MANAGER Action = "Manager"
+	VIEW    Action = "View"
+	NONE    Action = "None"
+	COOKIE  Action = "Cookie"
 )
 
 const (
-	Admin    = "Admin"
-	Merchant = "Merchant"
-	User     = "User"
-	Role     = "Role"
+	CONSOLE Subject = "Console"
+	AUTH    Subject = "Auth"
+	USERS   Subject = "Users"
+	ROLES   Subject = "Roles"
 )

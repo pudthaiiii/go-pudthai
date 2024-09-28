@@ -85,5 +85,11 @@ func (c *Config) loadAppConfig() {
 			"JwtAccessExpiresInHour":  getEnv("JWT_ACCESS_TOKEN_EXPIRES_IN_HOUR"),
 			"JwtRefreshExpiresInHour": getEnv("JWT_REFRESH_TOKEN_EXPIRES_IN_HOUR"),
 		},
+
+		// JWT config
+		"Cookie": map[string]interface{}{
+			"Name":   getEnv("COOKIE_NAME", "console"),
+			"Secret": getEnv("COOKIE_SECRET", "pudthai"),
+		},
 	}
 }

@@ -1,22 +1,21 @@
 package registry
 
 import (
-	c "go-ibooking/internal/adapter/v1/controllers"
-	ca "go-ibooking/internal/adapter/v1/controllers/admin"
-	cc "go-ibooking/internal/adapter/v1/controllers/console"
+	cc "go-ibooking/internal/adapter/console/controllers"
+	cm "go-ibooking/internal/adapter/console/middleware"
+	sm "go-ibooking/internal/adapter/shared/middleware"
+	ca "go-ibooking/internal/adapter/v1/admin/controllers"
 	"go-ibooking/internal/config"
 	"go-ibooking/internal/events"
 	"go-ibooking/internal/infrastructure/cache"
 	"go-ibooking/internal/infrastructure/datastore"
 	"go-ibooking/internal/infrastructure/recaptcha"
 
-	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
 )
 
 type registry struct {
 	db           *gorm.DB
-	redis        redis.UniversalClient
 	s3           *datastore.S3Datastore
 	cfg          *config.Config
 	recaptcha    *recaptcha.RecaptchaProvider
@@ -25,15 +24,14 @@ type registry struct {
 }
 
 type Registry interface {
-	NewController() c.AppController
 	NewAdminController() ca.AdminController
 	NewConsoleController() cc.ConsoleController
-	// NewAdminMiddleware() am.Middleware
+	NewConsoleMiddleware() cm.Middleware
+	NewSharedMiddleware() sm.Middleware
 }
 
 func NewRegistry(
 	db *gorm.DB,
-	redisClient redis.UniversalClient,
 	s3 *datastore.S3Datastore,
 	cfg *config.Config,
 	recaptcha *recaptcha.RecaptchaProvider,
@@ -42,7 +40,6 @@ func NewRegistry(
 ) Registry {
 	return &registry{
 		db:           db,
-		redis:        redisClient,
 		s3:           s3,
 		cfg:          cfg,
 		recaptcha:    recaptcha,
@@ -51,18 +48,9 @@ func NewRegistry(
 	}
 }
 
-func (r *registry) NewController() c.AppController {
-	ac := c.AppController{
-		UsersController: r.NewUsersController(),
-		AuthController:  r.NewAuthController(),
-	}
-
-	return ac
-}
-
 func (r *registry) NewConsoleController() cc.ConsoleController {
 	ac := cc.ConsoleController{
-		FeaturesController: r.NewFeaturesController(),
+		DatabaseController: r.NewConsoleDatabaseController(),
 	}
 
 	return ac
@@ -77,6 +65,10 @@ func (r *registry) NewAdminController() ca.AdminController {
 	return ac
 }
 
-// func (r *registry) NewAdminMiddleware() am.Middleware {
-// 	return am.NewMiddleware(r.db, r.redis)
-// }
+func (r *registry) NewConsoleMiddleware() cm.Middleware {
+	return cm.NewConsoleMiddleware(r.cfg)
+}
+
+func (r *registry) NewSharedMiddleware() sm.Middleware {
+	return sm.NewSharedMiddleware(r.cfg, r.cacheManager, r.db)
+}

@@ -4,9 +4,8 @@ import (
 	"context"
 	"fmt"
 	"go-ibooking/internal/entities"
-	"time"
+	b "go-ibooking/internal/model/business"
 
-	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -19,30 +18,38 @@ func NewOauthRefreshTokenRepository(db *gorm.DB) OauthRefreshTokenRepository {
 }
 
 type OauthRefreshTokenRepository interface {
-	Create(ctx context.Context, accessTokenID uint, expiresAt string) (entities.OauthRefreshToken, error)
+	FindByToken(ctx context.Context, token string) (b.RefreshTokenResult, error)
+	DeleteByID(ctx context.Context, id uint) error
 }
 
-func (r *oauthRefreshTokenRepository) Create(ctx context.Context, accessTokenID uint, expiresAt string) (entities.OauthRefreshToken, error) {
-	newUUID := uuid.New()
+func (r *oauthRefreshTokenRepository) FindByToken(ctx context.Context, token string) (b.RefreshTokenResult, error) {
+	var (
+		refreshTokenResult b.RefreshTokenResult
+	)
 
-	duration, err := time.ParseDuration(expiresAt + "h")
-	if err != nil {
-		return entities.OauthRefreshToken{}, err
-	}
-
-	expiredAt := time.Now().Add(duration)
-
-	var refreshToken = entities.OauthRefreshToken{
-		Token:              newUUID.String(),
-		ExpiresAt:          &expiredAt,
-		OAuthAccessTokenID: accessTokenID,
-	}
-
-	fmt.Println("refreshToken", refreshToken)
-	query := r.db.WithContext(ctx).Create(&refreshToken)
+	query := r.db.WithContext(ctx).
+		Joins("JOIN oauth_access_tokens ON oauth_access_tokens.id = oauth_refresh_tokens.oauth_access_token_id").
+		Joins("JOIN users ON oauth_access_tokens.user_id = users.id").
+		Select("oauth_refresh_tokens.id, oauth_refresh_tokens.token, oauth_refresh_tokens.expires_at, oauth_access_tokens.user_id, users.type").
+		Where("oauth_refresh_tokens.token = ?", token).
+		First(&refreshTokenResult)
 	if query.Error != nil {
-		return entities.OauthRefreshToken{}, query.Error
+		return b.RefreshTokenResult{}, query.Error
 	}
 
-	return refreshToken, nil
+	return refreshTokenResult, nil
+}
+
+func (r *oauthRefreshTokenRepository) DeleteByID(ctx context.Context, id uint) error {
+	result := r.db.WithContext(ctx).Unscoped().Where("id = ?", id).Delete(&entities.OauthRefreshToken{})
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("no record found with id %d", id)
+	}
+
+	return nil
 }

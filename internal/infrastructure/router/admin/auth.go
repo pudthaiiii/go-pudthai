@@ -1,14 +1,20 @@
 package router
 
 import (
-	controller "go-ibooking/internal/adapter/v1/controllers/admin"
-	"go-ibooking/internal/model/technical"
+	ca "go-ibooking/internal/adapter/v1/admin/controllers"
+	p "go-ibooking/internal/enum/permission"
+	t "go-ibooking/internal/model/technical"
 )
 
-func addAdminAuthRoute(c controller.AuthController) technical.Routes {
-	return technical.Routes{
-		technical.Route{
-			Name: "Login", Method: "POST", Path: "login", Action: "Login", Subject: "Auth", HandlerFunc: c.Login,
+func addAdminAuthRoute(c ca.AuthController) t.Routes {
+	return t.Routes{
+		// login
+		t.Route{
+			Name: "Login", Method: "POST", Path: "login", Action: string(p.NONE), Subject: string(p.AUTH), HandlerFunc: c.Login,
+		},
+		// refresh
+		t.Route{
+			Name: "Refresh", Method: "POST", Path: "refresh", Action: string(p.NONE), Subject: string(p.AUTH), HandlerFunc: c.Refresh,
 		},
 	}
 }
