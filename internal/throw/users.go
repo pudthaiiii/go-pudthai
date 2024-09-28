@@ -15,7 +15,3 @@ func UserError(err error) error {
 func UserNotFound() error {
 	return Error(910204, nil)
 }
-
-func UserCredentialMismatch() error {
-	return Error(100001, nil)
-}

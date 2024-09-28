@@ -1,7 +1,8 @@
 package registry
 
 import (
-	"go-ibooking/internal/adapter/v1/controllers"
+	c "go-ibooking/internal/adapter/v1/controllers"
+	ca "go-ibooking/internal/adapter/v1/controllers/admin"
 	cc "go-ibooking/internal/adapter/v1/controllers/console"
 	"go-ibooking/internal/config"
 	"go-ibooking/internal/events"
@@ -24,7 +25,8 @@ type registry struct {
 }
 
 type Registry interface {
-	NewController() controllers.AppController
+	NewController() c.AppController
+	NewAdminController() ca.AdminController
 	NewConsoleController() cc.ConsoleController
 	// NewAdminMiddleware() am.Middleware
 }
@@ -49,8 +51,8 @@ func NewRegistry(
 	}
 }
 
-func (r *registry) NewController() controllers.AppController {
-	ac := controllers.AppController{
+func (r *registry) NewController() c.AppController {
+	ac := c.AppController{
 		UsersController: r.NewUsersController(),
 		AuthController:  r.NewAuthController(),
 	}
@@ -61,6 +63,15 @@ func (r *registry) NewController() controllers.AppController {
 func (r *registry) NewConsoleController() cc.ConsoleController {
 	ac := cc.ConsoleController{
 		FeaturesController: r.NewFeaturesController(),
+	}
+
+	return ac
+}
+
+func (r *registry) NewAdminController() ca.AdminController {
+	ac := ca.AdminController{
+		AuthController:  r.NewAdminAuthController(),
+		UsersController: r.NewAdminUsersController(),
 	}
 
 	return ac

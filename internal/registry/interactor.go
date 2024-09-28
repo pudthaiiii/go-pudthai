@@ -11,11 +11,3 @@ func (r *registry) NewUsersInteractor() i.UsersInteractor {
 		r.listener,
 	)
 }
-
-func (r *registry) NewAuthInteractor() i.AuthInteractor {
-	return i.NewAuthInteractor(
-		r.NewUsersRepository(),
-		r.cacheManager,
-		r.cfg,
-	)
-}

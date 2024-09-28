@@ -1,13 +1,15 @@
 package entities
 
-import "time"
+import (
+	"time"
 
-type OAuthAccessToken struct {
-	ID        uint   `gorm:"primaryKey"`
+	"gorm.io/gorm"
+)
+
+type OauthAccessToken struct {
+	gorm.Model
 	Token     string `gorm:"unique;not null"`
 	ExpiresAt *time.Time
-	UserID    uint      `gorm:"index"`
-	User      User      `gorm:"foreignKey:UserID;references:ID"`
-	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	UserID    uint `gorm:"index"`
+	User      User `gorm:"foreignKey:UserID;references:ID"`
 }

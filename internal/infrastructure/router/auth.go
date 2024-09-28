@@ -16,10 +16,5 @@ func addAuthRoute(c controller.AuthController) technical.Routes {
 		technical.Route{
 			Name: "LoginBackend", Method: "POST", Path: "backend/login", Action: "Login", Subject: "Auth", HandlerFunc: c.LoginBackend,
 		},
-
-		// Login Admin
-		technical.Route{
-			Name: "LoginAdmin", Method: "POST", Path: "admin/login", Action: "Login", Subject: "Auth", HandlerFunc: c.LoginAdmin,
-		},
 	}
 }

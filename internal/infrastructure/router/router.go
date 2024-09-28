@@ -3,7 +3,8 @@ package router
 import (
 	_ "go-ibooking/docs"
 	"go-ibooking/internal/adapter/v1/controllers"
-	routerConsole "go-ibooking/internal/infrastructure/router/console"
+	ra "go-ibooking/internal/infrastructure/router/admin"
+	rc "go-ibooking/internal/infrastructure/router/console"
 	"go-ibooking/internal/model/technical"
 	"go-ibooking/internal/registry"
 
@@ -14,7 +15,8 @@ import (
 func InitializeRoute(fiber *fiber.App, r registry.Registry) *fiber.App {
 	fiber.Get("/swagger/*", swagger.HandlerDefault)
 
-	routerConsole.InitializeConsoleRoute(fiber, r.NewConsoleController())
+	rc.InitializeConsoleRoute(fiber, r.NewConsoleController())
+	ra.InitializeAdminRoute(fiber, r.NewAdminController())
 
 	initializeRoute(fiber, r.NewController())
 

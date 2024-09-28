@@ -1,0 +1,14 @@
+package router
+
+import (
+	controller "go-ibooking/internal/adapter/v1/controllers/admin"
+	t "go-ibooking/internal/model/technical"
+)
+
+func addAdminUsersRoute(c controller.UsersController) t.Routes {
+	return t.Routes{
+		t.Route{
+			Name: "Create", Method: "POST", Path: "/users", Action: "", Subject: "", HandlerFunc: c.Create,
+		},
+	}
+}

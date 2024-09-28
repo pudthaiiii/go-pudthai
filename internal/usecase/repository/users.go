@@ -60,6 +60,6 @@ func (r *usersRepository) FindUserByEmail(ctx context.Context, email string, use
 		query = query.Where("type = ?", userType)
 	}
 
-	err := query.First(&user).Error
+	err := query.Preload("Role").First(&user).Error
 	return user, err
 }

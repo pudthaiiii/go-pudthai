@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"go-ibooking/internal/adapter/v1/controllers"
 	"go-ibooking/internal/model/dtos"
 	"go-ibooking/internal/usecase/interactor"
 	"go-ibooking/internal/validator"
@@ -46,5 +47,5 @@ func (u usersController) Create(c *fiber.Ctx) error {
 		return err
 	}
 
-	return Success(c, result, nil)
+	return controllers.Success(c, result, nil)
 }

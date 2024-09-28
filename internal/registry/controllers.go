@@ -11,5 +11,5 @@ func (r *registry) NewUsersController() c.UsersController {
 
 // AuthController
 func (r *registry) NewAuthController() c.AuthController {
-	return c.NewAuthController(r.NewAuthInteractor())
+	return c.NewAuthController(r.NewSharedAuthInteractor())
 }

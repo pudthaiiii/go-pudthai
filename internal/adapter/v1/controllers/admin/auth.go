@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"go-ibooking/internal/adapter/v1/controllers"
 	"go-ibooking/internal/enum"
 	"go-ibooking/internal/model/dtos"
 	i "go-ibooking/internal/usecase/interactor/shared"
@@ -21,7 +22,6 @@ func NewAuthController(authInteractor i.SharedAuthInteractor) AuthController {
 
 type AuthController interface {
 	Login(c *fiber.Ctx) error
-	LoginBackend(c *fiber.Ctx) error
 }
 
 func (s authController) Login(c *fiber.Ctx) error {
@@ -30,24 +30,10 @@ func (s authController) Login(c *fiber.Ctx) error {
 		return errValidate
 	}
 
-	result, err := s.authInteractor.Login(c.Context(), req, string(enum.USER))
+	result, err := s.authInteractor.Login(c.Context(), req, string(enum.ADMIN))
 	if err != nil {
 		return err
 	}
 
-	return Success(c, result, nil)
-}
-
-func (s authController) LoginBackend(c *fiber.Ctx) error {
-	req := dtos.Login{}
-	if errValidate := validator.Validate(c, &req); errValidate != nil {
-		return errValidate
-	}
-
-	result, err := s.authInteractor.Login(c.Context(), req, string(enum.MERCHANT))
-	if err != nil {
-		return err
-	}
-
-	return Success(c, result, nil)
+	return controllers.Success(c, result, nil)
 }
