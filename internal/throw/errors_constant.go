@@ -11,7 +11,7 @@ var ErrorCodes = map[int]string{
 	900401: "UNAUTHORIZED",
 	900403: "FORBIDDEN",
 	900422: "VALIDATE_ERROR",
-	910001: "TYPEORM_ERROR",
+	910001: "GORM_ERROR",
 	910002: "INSUFFICIENT_ABILITY",
 	910003: "UPLOADER_ERROR",
 
@@ -35,6 +35,9 @@ var ErrorCodes = map[int]string{
 	910202: "USER_EMAIL_EXISTS",
 	910203: "USER_ERROR",
 	910204: "USER_NOT_FOUND",
+
+	// Merchant
+	910301: "MERCHANT_NOT_FOUND",
 }
 
 func Error(code int, err error) error {

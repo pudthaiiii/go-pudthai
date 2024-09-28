@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"go-ibooking/internal/entities"
 	"go-ibooking/internal/enum"
 	"go-ibooking/internal/model/dtos"
@@ -60,10 +61,15 @@ func (r *usersRepository) CreateAdminUser(ctx context.Context, dto dtos.CreateUs
 func (r *usersRepository) FindUserByEmail(ctx context.Context, email string, userType string) (entities.User, error) {
 	var user entities.User
 
-	query := r.db.WithContext(ctx).Where("email = ?", email)
+	Test := ctx.Value("TestMM")
+	Test1 := ctx.Value("MerchantID")
+	fmt.Println("Test", Test, Test1)
+
+	fmt.Println("FInd")
+	query := r.db.WithContext(ctx).Where("LOWER(email) = LOWER(?)", email)
 
 	if userType != "" {
-		query = query.Where("type = ?", userType)
+		query = query.Where("UPPER(type) = UPPER(?)", userType)
 	}
 
 	merchantID, ok := ctx.Value("MerchantID").(string)

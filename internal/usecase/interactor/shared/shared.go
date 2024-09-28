@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"go-ibooking/internal/adapter/v1/admin/dtos"
+	"go-ibooking/internal/adapter/shared/dtos"
 	"go-ibooking/internal/enum"
 	"go-ibooking/internal/throw"
 	"go-ibooking/internal/utils"

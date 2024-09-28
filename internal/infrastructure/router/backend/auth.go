@@ -1,12 +1,12 @@
 package router
 
 import (
-	ac "go-ibooking/internal/adapter/v1/admin/controllers"
+	cb "go-ibooking/internal/adapter/v1/backend/controllers"
 	p "go-ibooking/internal/enum/permission"
 	t "go-ibooking/internal/model/technical"
 )
 
-func addAuthRoute(c ac.AuthController) t.Routes {
+func addAuthRoute(c cb.AuthController) t.Routes {
 	return t.Routes{
 		// login
 		t.Route{

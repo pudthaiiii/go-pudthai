@@ -3,7 +3,7 @@ package interactor
 import (
 	"context"
 	"errors"
-	"go-ibooking/internal/adapter/v1/admin/dtos"
+	"go-ibooking/internal/adapter/shared/dtos"
 	"go-ibooking/internal/config"
 	"go-ibooking/internal/infrastructure/cache"
 	"go-ibooking/internal/throw"

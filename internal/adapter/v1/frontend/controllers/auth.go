@@ -31,7 +31,7 @@ func (s authController) Login(c *fiber.Ctx) error {
 		return errValidate
 	}
 
-	result, err := s.authInteractor.Login(c.Context(), req, string(enum.ADMIN))
+	result, err := s.authInteractor.Login(c.Context(), req, string(enum.USER))
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func (s authController) Refresh(c *fiber.Ctx) error {
 		return errValidate
 	}
 
-	result, err := s.authInteractor.Refresh(c.Context(), req, string(enum.ADMIN))
+	result, err := s.authInteractor.Refresh(c.Context(), req, string(enum.USER))
 	if err != nil {
 		return err
 	}

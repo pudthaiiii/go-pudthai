@@ -2,18 +2,17 @@ package router
 
 import (
 	smm "go-ibooking/internal/adapter/shared/middleware"
-	ac "go-ibooking/internal/adapter/v1/admin/controllers"
+	bc "go-ibooking/internal/adapter/v1/backend/controllers"
 	t "go-ibooking/internal/model/technical"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func InitializeAdminRoute(app *fiber.App, c ac.AdminController, sm smm.Middleware) *fiber.App {
+func InitializeBackendRoute(app *fiber.App, c bc.BackendController, sm smm.Middleware) *fiber.App {
 	var routes = t.Routes{}
-	prefix := app.Group("/v1/admin")
+	prefix := app.Group("/v1/backend")
 
 	routes = append(routes, addAuthRoute(c.AuthController)...)
-	routes = append(routes, addUsersRoute(c.UsersController)...)
 
 	for _, route := range routes {
 		handler := route.HandlerFunc

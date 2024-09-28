@@ -1,7 +1,7 @@
 package router
 
 import (
-	ac "go-ibooking/internal/adapter/v1/admin/controllers"
+	ac "go-ibooking/internal/adapter/v1/frontend/controllers"
 	p "go-ibooking/internal/enum/permission"
 	t "go-ibooking/internal/model/technical"
 )

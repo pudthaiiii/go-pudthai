@@ -5,7 +5,7 @@ import (
 	t "go-ibooking/internal/model/technical"
 )
 
-func addAdminUsersRoute(c controller.UsersController) t.Routes {
+func addUsersRoute(c controller.UsersController) t.Routes {
 	return t.Routes{
 		t.Route{
 			Name: "Create", Method: "POST", Path: "/users", Action: "", Subject: "", HandlerFunc: c.Create,
