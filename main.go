@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go-ibooking/cmd/api"
+	"go-pudthai/cmd/api"
 )
 
 func main() {

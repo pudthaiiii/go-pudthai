@@ -2,9 +2,8 @@ package middleware
 
 import (
 	"context"
-	"fmt"
-	"go-ibooking/internal/model/technical"
-	"go-ibooking/internal/throw"
+	"go-pudthai/internal/model/technical"
+	"go-pudthai/internal/throw"
 	"strconv"
 	"strings"
 
@@ -37,19 +36,6 @@ func (m *middleware) RequiredMerchant(handler fiber.Handler, action string, subj
 
 		ctx := context.WithValue(c.Context(), technical.MerchantIDKey, merchantID)
 		ctx = context.WithValue(ctx, technical.MerchantKey, merchant)
-
-		c.SetUserContext(ctx)
-
-		return handler(c)
-	}
-}
-
-func (m *middleware) Authenticate(handler fiber.Handler, action string, subject string) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		fmt.Println("Get user from context", action, subject)
-
-		c.Locals(technical.MemberKey, "Test1")
-		ctx := context.WithValue(c.Context(), technical.MemberKey, "Test1")
 
 		c.SetUserContext(ctx)
 

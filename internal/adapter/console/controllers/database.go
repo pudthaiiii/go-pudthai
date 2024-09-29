@@ -1,12 +1,12 @@
 package controllers
 
 import (
-	"go-ibooking/internal/entities"
+	"go-pudthai/internal/entities"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 
-	logger "go-ibooking/internal/infrastructure/logger"
+	logger "go-pudthai/internal/infrastructure/logger"
 )
 
 type dbController struct {

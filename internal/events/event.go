@@ -1,8 +1,8 @@
 package events
 
 import (
-	"go-ibooking/internal/infrastructure/cache"
-	"go-ibooking/internal/infrastructure/mailer"
+	"go-pudthai/internal/infrastructure/cache"
+	"go-pudthai/internal/infrastructure/mailer"
 
 	"gorm.io/gorm"
 )

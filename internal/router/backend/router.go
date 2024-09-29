@@ -1,9 +1,9 @@
 package router
 
 import (
-	smm "go-ibooking/internal/adapter/shared/middleware"
-	bc "go-ibooking/internal/adapter/v1/backend/controllers"
-	t "go-ibooking/internal/model/technical"
+	smm "go-pudthai/internal/adapter/shared/middleware"
+	bc "go-pudthai/internal/adapter/v1/backend/controllers"
+	t "go-pudthai/internal/model/technical"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -16,11 +16,13 @@ func InitializeBackendRoute(app *fiber.App, c bc.BackendController, sm smm.Middl
 
 	for _, route := range routes {
 		handler := route.HandlerFunc
-
-		handler = sm.Authenticate(handler, route.Action, route.Subject)
-		handler = sm.RequiredMerchant(handler, route.Action, route.Subject)
-
 		prefix.Name(route.Name)
+
+		handler = sm.RequiredMerchant(handler, route.Action, route.Subject)
+		handler = sm.Authenticate(handler, route.Action, route.Subject)
+		handler = sm.GoogleRecaptcha(handler, route.Action, route.Subject)
+		handler = sm.Log(handler, route.Name, route.Action, route.Subject)
+
 		prefix.Add(route.Method, route.Path, handler)
 	}
 

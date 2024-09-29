@@ -1,8 +1,8 @@
 package router
 
 import (
-	ac "go-ibooking/internal/adapter/v1/admin/controllers"
-	t "go-ibooking/internal/model/technical"
+	ac "go-pudthai/internal/adapter/v1/admin/controllers"
+	t "go-pudthai/internal/model/technical"
 )
 
 func addAuthRoute(c ac.AuthController) t.Routes {

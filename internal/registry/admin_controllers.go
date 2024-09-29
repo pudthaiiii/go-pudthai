@@ -1,7 +1,7 @@
 package registry
 
 import (
-	c "go-ibooking/internal/adapter/v1/admin/controllers"
+	c "go-pudthai/internal/adapter/v1/admin/controllers"
 )
 
 // AuthController

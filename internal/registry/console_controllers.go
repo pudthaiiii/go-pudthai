@@ -1,7 +1,7 @@
 package registry
 
 import (
-	cc "go-ibooking/internal/adapter/console/controllers"
+	cc "go-pudthai/internal/adapter/console/controllers"
 )
 
 // NewPrototypeController

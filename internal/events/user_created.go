@@ -1,7 +1,7 @@
 package events
 
 import (
-	"go-ibooking/internal/entities"
+	"go-pudthai/internal/entities"
 
 	"github.com/jinzhu/copier"
 )

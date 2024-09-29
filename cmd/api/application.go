@@ -1,15 +1,23 @@
+// Code by พิเชษฐ์ ขุนใจ (คุณผัดไท)
+// source: cmd/api/application.go
+
+/*
+Package api ใช้สำหรับการสร้างแอปพลิเคชัน API
+
+โดยจะมีการตั้งค่าและเริ่มต้นการทำงานของแอปพลิเคชัน
+*/
 package api
 
 import (
-	"go-ibooking/internal/config"
-	"go-ibooking/internal/events"
-	"go-ibooking/internal/infrastructure/cache"
-	"go-ibooking/internal/infrastructure/datastore"
-	"go-ibooking/internal/infrastructure/logger"
-	"go-ibooking/internal/infrastructure/mailer"
-	"go-ibooking/internal/infrastructure/recaptcha"
-	"go-ibooking/internal/registry"
-	"go-ibooking/internal/router"
+	"go-pudthai/internal/config"
+	"go-pudthai/internal/events"
+	"go-pudthai/internal/infrastructure/cache"
+	"go-pudthai/internal/infrastructure/datastore"
+	"go-pudthai/internal/infrastructure/logger"
+	"go-pudthai/internal/infrastructure/mailer"
+	"go-pudthai/internal/infrastructure/recaptcha"
+	"go-pudthai/internal/registry"
+	"go-pudthai/internal/router"
 	"log"
 	"time"
 
@@ -22,84 +30,96 @@ type application struct {
 	cfg   *config.Config
 }
 
+// NewApiApplication ทำการสร้างและตั้งค่าแอปพลิเคชัน API ใหม่
 func NewApiApplication() *application {
-	config, err := config.NewConfig()
+	cfg, err := config.NewConfig()
 	if err != nil {
-		log.Printf("unable to load config, %v", err)
+		log.Fatalf("ไม่สามารถโหลดการตั้งค่าได้: %v", err)
 	}
 
-	config.Initialize()
+	cfg.Initialize()
+	app := &application{
+		cfg:   cfg,
+		fiber: newFiberApp(cfg),
+	}
 
+	return app
+}
+
+// newFiberApp ตั้งค่าและส่งกลับ instance ของ Fiber application ใหม่
+func newFiberApp(cfg *config.Config) *fiber.App {
 	fiberConfig := fiber.Config{
-		BodyLimit:       config.Get("FiberConfig")["BodyLimit"].(int),
-		ReadBufferSize:  config.Get("FiberConfig")["ReadBufferSize"].(int),
-		WriteBufferSize: config.Get("FiberConfig")["WriteBufferSize"].(int),
+		BodyLimit:       cfg.Get("FiberConfig")["BodyLimit"].(int),
+		ReadBufferSize:  cfg.Get("FiberConfig")["ReadBufferSize"].(int),
+		WriteBufferSize: cfg.Get("FiberConfig")["WriteBufferSize"].(int),
 		ReadTimeout:     10 * time.Second,
 		WriteTimeout:    10 * time.Second,
 		ErrorHandler:    errorHandler,
 	}
 
-	return &application{
-		cfg:   config,
-		fiber: fiber.New(fiberConfig),
-	}
+	return fiber.New(fiberConfig)
 }
 
+// Fiber ส่งกลับ instance ของ Fiber application
 func (app *application) Fiber() *fiber.App {
 	return app.fiber
 }
 
+// Config ส่งกลับการตั้งค่าของแอปพลิเคชัน
 func (app *application) Config() *config.Config {
 	return app.cfg
 }
 
+// Boot เริ่มต้นการทำงานของแอปพลิเคชันและฟังก์ชันต่างๆ
 func (app *application) Boot() {
-	app.loadLogger()
-	app.loadRouter()
-
-	app.listen()
+	app.setupLogger()
+	app.setupRouter()
+	app.startListening()
 }
 
-func (app *application) loadRouter() {
-	r := app.setupRegistry()
-
-	router.InitializeRoute(app.fiber, r)
+// setupRouter ตั้งค่า router สำหรับแอปพลิเคชัน
+func (app *application) setupRouter() {
+	reg := app.initializeRegistry()
+	router.InitializeRoute(app.fiber, reg)
 }
 
-func (app *application) loadLogger() {
+// setupLogger ตั้งค่า logger สำหรับแอปพลิเคชัน
+func (app *application) setupLogger() {
 	logger.NewInitializeLogger(app.cfg)
 }
 
-func (app *application) registryListener(db *gorm.DB, cacheManager *cache.CacheManager) events.EventListener {
-	mailer := mailer.NewMailer(app.cfg)
-	listener := events.NewEventListener(mailer, db, cacheManager)
+// initializeRegistry ตั้งค่าระบบ registry ของแอปพลิเคชัน
+func (app *application) initializeRegistry() registry.Registry {
+	s3 := datastore.NewS3Datastore(app.cfg)
+	db := datastore.NewPgDatastore(app.cfg)
+	redis := datastore.NewRedisDatastore(app.cfg)
+	recaptchaProvider := recaptcha.NewRecaptchaProvider(app.cfg)
 
-	go listener.Listen()
+	cacheManager := cache.NewCacheManager(redis.Client, 5*time.Minute)
+	listener := app.createEventListener(db, cacheManager)
+
+	return registry.NewRegistry(db, s3, app.cfg, recaptchaProvider, cacheManager, listener)
+}
+
+// createEventListener ตั้งค่า event listener สำหรับแอปพลิเคชัน
+func (app *application) createEventListener(db *gorm.DB, cacheManager *cache.CacheManager) events.EventListener {
+	mailerInstance := mailer.NewMailer(app.cfg)
+	listener := events.NewEventListener(mailerInstance, db, cacheManager)
+
+	go listener.Listen() // รัน listener ใน goroutine
 
 	return listener
 }
 
-func (app *application) setupRegistry() registry.Registry {
-	s3 := datastore.NewS3Datastore(app.cfg)
-	db := datastore.NewPgDatastore(app.cfg)
-	cfg := app.cfg
-	redis := datastore.NewRedisDatastore(app.cfg)
-	recaptcha := recaptcha.NewRecaptchaProvider(app.cfg)
-
-	cacheManager := cache.NewCacheManager(redis.Client, 5*time.Minute)
-	listener := app.registryListener(db, cacheManager)
-
-	return registry.NewRegistry(db, s3, cfg, recaptcha, cacheManager, listener)
-}
-
-func (app *application) listen() {
+// startListening เริ่มฟังการร้องขอบนพอร์ตที่กำหนด
+func (app *application) startListening() {
 	port := app.cfg.Get("FiberConfig")["Port"].(string)
-
 	if err := app.fiber.Listen(":" + port); err != nil {
-		log.Printf("Server failed to start %v", err)
+		log.Fatalf("เซิร์ฟเวอร์ไม่สามารถเริ่มต้นได้: %v", err)
 	}
 }
 
+// DeferClose ทำการทำความสะอาดก่อนปิดแอปพลิเคชัน
 func (app *application) DeferClose() {
 	defer logger.CloseLogger()
 }

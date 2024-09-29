@@ -1,8 +1,8 @@
 package registry
 
 import (
-	"go-ibooking/internal/entities"
-	"go-ibooking/internal/usecase/repository"
+	"go-pudthai/internal/entities"
+	"go-pudthai/internal/usecase/repository"
 
 	"gorm.io/gorm"
 )

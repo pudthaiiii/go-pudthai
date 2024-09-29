@@ -1,3 +1,11 @@
+// Code by พิเชษฐ์ ขุนใจ (คุณผัดไท)
+// source: internal/validator/validator.go
+
+/*
+Package validator เป็น package ที่ใช้สำหรับการตรวจสอบความถูกต้องของข้อมูล
+
+ไฟล์นี้ใช้สำหรับจัดการการตรวจสอบความถูกต้องของข้อมูล (Validation) ในแอปพลิเคชัน
+*/
 package validator
 
 import (
@@ -9,20 +17,24 @@ import (
 	"github.com/iancoleman/strcase"
 )
 
+// ใช้ validator จาก go-playground
 var validate = validator.New()
 
 type (
+	// errorResponse ใช้ในการเก็บข้อมูลข้อผิดพลาดเมื่อการตรวจสอบล้มเหลว
 	errorResponse struct {
 		Error       bool
 		FailedField string
 		Tag         string
 	}
 
+	// xValidator struct ที่เป็นตัวแทนของ validator ที่ใช้งาน
 	xValidator struct {
 		validator *validator.Validate
 	}
 )
 
+// ฟังก์ชัน inValidate สำหรับตรวจสอบ struct ที่ได้รับ
 func (v xValidator) inValidate(data interface{}) []errorResponse {
 	validationErrors := []errorResponse{}
 
@@ -42,7 +54,7 @@ func (v xValidator) inValidate(data interface{}) []errorResponse {
 	return validationErrors
 }
 
-// ฟังก์ชัน Validate
+// ฟังก์ชัน Validate สำหรับตรวจสอบข้อมูลที่ได้รับจาก request
 func Validate[T any](c *fiber.Ctx, data *T) error {
 	myValidator := &xValidator{
 		validator: validate,
@@ -80,7 +92,7 @@ func Validate[T any](c *fiber.Ctx, data *T) error {
 	return nil
 }
 
-// ฟังก์ชัน handleValidationError คืน error
+// ฟังก์ชัน handleValidationError สำหรับจัดการ error ที่เกิดจากการตรวจสอบ
 func handleValidationError(_ *fiber.Ctx, errors interface{}) error {
 	response := map[string]interface{}{
 		"message": "VALIDATE_ERROR",

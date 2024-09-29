@@ -1,30 +1,30 @@
+// Code by พิเชษฐ์ ขุนใจ (คุณผัดไท)
+// source: internal/registry/registry.go
+
+/*
+Package registry ใช้สำหรับจัดการการลงทะเบียน dependencies ต่างๆ ที่จำเป็น
+เช่น Controllers, Middleware และอื่นๆ โดยเป็นตัวเชื่อมระหว่างโครงสร้างพื้นฐาน
+และส่วนต่างๆ ของแอปพลิเคชัน
+*/
 package registry
 
 import (
-	cc "go-ibooking/internal/adapter/console/controllers"
-	cm "go-ibooking/internal/adapter/console/middleware"
-	sm "go-ibooking/internal/adapter/shared/middleware"
-	ac "go-ibooking/internal/adapter/v1/admin/controllers"
-	ab "go-ibooking/internal/adapter/v1/backend/controllers"
-	af "go-ibooking/internal/adapter/v1/frontend/controllers"
-	"go-ibooking/internal/config"
-	"go-ibooking/internal/events"
-	"go-ibooking/internal/infrastructure/cache"
-	"go-ibooking/internal/infrastructure/datastore"
-	"go-ibooking/internal/infrastructure/recaptcha"
+	cc "go-pudthai/internal/adapter/console/controllers"
+	cm "go-pudthai/internal/adapter/console/middleware"
+	sm "go-pudthai/internal/adapter/shared/middleware"
+	ac "go-pudthai/internal/adapter/v1/admin/controllers"
+	ab "go-pudthai/internal/adapter/v1/backend/controllers"
+	af "go-pudthai/internal/adapter/v1/frontend/controllers"
+	"go-pudthai/internal/config"
+	"go-pudthai/internal/events"
+	"go-pudthai/internal/infrastructure/cache"
+	"go-pudthai/internal/infrastructure/datastore"
+	"go-pudthai/internal/infrastructure/recaptcha"
 
 	"gorm.io/gorm"
 )
 
-type registry struct {
-	db           *gorm.DB
-	s3           *datastore.S3Datastore
-	cfg          *config.Config
-	recaptcha    *recaptcha.RecaptchaProvider
-	cacheManager *cache.CacheManager
-	listener     events.EventListener
-}
-
+// Registry interface คือส่วนที่กำหนดฟังก์ชันสำหรับสร้าง Controller และ Middleware ต่างๆ
 type Registry interface {
 	NewAdminController() ac.AdminController
 	NewBackendController() ab.BackendController
@@ -34,6 +34,17 @@ type Registry interface {
 	NewSharedMiddleware() sm.Middleware
 }
 
+// registry struct คือโครงสร้างที่ใช้ในการเก็บ dependencies ต่างๆ ที่จำเป็น
+type registry struct {
+	db           *gorm.DB
+	s3           *datastore.S3Datastore
+	cfg          *config.Config
+	recaptcha    *recaptcha.RecaptchaProvider
+	cacheManager *cache.CacheManager
+	listener     events.EventListener
+}
+
+// NewRegistry เป็นฟังก์ชันที่ใช้สร้าง registry ใหม่พร้อม dependencies ที่จำเป็น
 func NewRegistry(
 	db *gorm.DB,
 	s3 *datastore.S3Datastore,
@@ -52,49 +63,41 @@ func NewRegistry(
 	}
 }
 
-// Console Controllers
+// NewConsoleController เป็นฟังก์ชันที่ใช้สร้าง ConsoleController
 func (r *registry) NewConsoleController() cc.ConsoleController {
-	ac := cc.ConsoleController{
+	return cc.ConsoleController{
 		DatabaseController: r.NewConsoleDatabaseController(),
 	}
-
-	return ac
 }
 
-// Admin Controllers
+// NewAdminController เป็นฟังก์ชันที่ใช้สร้าง AdminController
 func (r *registry) NewAdminController() ac.AdminController {
-	ac := ac.AdminController{
+	return ac.AdminController{
 		AuthController:  r.NewAdminAuthController(),
 		UsersController: r.NewAdminUsersController(),
 	}
-
-	return ac
 }
 
-// Backend Controllers
+// NewBackendController เป็นฟังก์ชันที่ใช้สร้าง BackendController
 func (r *registry) NewBackendController() ab.BackendController {
-	ac := ab.BackendController{
+	return ab.BackendController{
 		AuthController: r.NewBackendAuthController(),
 	}
-
-	return ac
 }
 
-// Frontend Controllers
+// NewFrontendController เป็นฟังก์ชันที่ใช้สร้าง FrontendController
 func (r *registry) NewFrontendController() af.FrontendController {
-	ac := af.FrontendController{
+	return af.FrontendController{
 		AuthController: r.NewFrontendAuthController(),
 	}
-
-	return ac
 }
 
-// Console Middleware
+// NewConsoleMiddleware เป็นฟังก์ชันที่ใช้สร้าง middleware สำหรับ Console
 func (r *registry) NewConsoleMiddleware() cm.Middleware {
 	return cm.NewConsoleMiddleware(r.cfg)
 }
 
-// Shared Middleware
+// NewSharedMiddleware เป็นฟังก์ชันที่ใช้สร้าง shared middleware
 func (r *registry) NewSharedMiddleware() sm.Middleware {
-	return sm.NewSharedMiddleware(r.cfg, r.cacheManager, r.db)
+	return sm.NewSharedMiddleware(r.cfg, r.cacheManager, r.db, r.recaptcha)
 }

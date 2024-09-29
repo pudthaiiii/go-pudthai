@@ -1,4 +1,4 @@
-module go-ibooking
+module go-pudthai
 
 go 1.22.6
 
@@ -15,7 +15,11 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
+	github.com/armon/go-radix v1.0.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
+	github.com/elastic/go-licenser v0.3.1 // indirect
+	github.com/elastic/go-sysinfo v1.1.1 // indirect
+	github.com/elastic/go-windows v1.0.0 // indirect
 	github.com/go-openapi/analysis v0.21.4 // indirect
 	github.com/go-openapi/errors v0.20.4 // indirect
 	github.com/go-openapi/loads v0.21.2 // indirect
@@ -23,13 +27,25 @@ require (
 	github.com/go-openapi/strfmt v0.21.8 // indirect
 	github.com/go-openapi/validate v0.22.3 // indirect
 	github.com/go-sql-driver/mysql v1.8.1 // indirect
+	github.com/jcchavezs/porto v0.1.0 // indirect
+	github.com/joeshaw/multierror v0.0.0-20140124173710-69b34d4ec901 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	github.com/prometheus/procfs v0.0.0-20190425082905-87a4384529e0 // indirect
 	github.com/robfig/cron v1.2.0 // indirect
+	github.com/santhosh-tekuri/jsonschema v1.2.4 // indirect
+	go.elastic.co/apm v1.15.0 // indirect
+	go.elastic.co/apm/module/apmfasthttp v1.15.0 // indirect
+	go.elastic.co/apm/module/apmhttp v1.15.0 // indirect
+	go.elastic.co/fastjson v1.1.0 // indirect
 	go.mongodb.org/mongo-driver v1.13.1 // indirect
+	golang.org/x/lint v0.0.0-20201208152925-83fdc39ff7b5 // indirect
+	golang.org/x/mod v0.20.0 // indirect
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/driver/mysql v1.5.6 // indirect
+	howett.net/plist v0.0.0-20181124034731-591f970eefbb // indirect
 )
 
 require (
@@ -91,6 +107,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.55.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
+	go.elastic.co/apm/module/apmfiber v1.15.0
 	golang.org/x/crypto v0.27.0 // indirect
 	golang.org/x/net v0.28.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect

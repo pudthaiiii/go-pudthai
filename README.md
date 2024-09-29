@@ -1,6 +1,8 @@
-# GO Prototype IBooking API
+# GO API
 
-This project is an API service for the iBooking application. Below are the instructions to set up and run the project.
+โครงการนี้สร้างโดย พิเชษฐ์ ขุนใจ (คุณผัดไท)
+
+This project is an API service for the application. Below are the instructions to set up and run the project.
 
 ## Prerequisites
 

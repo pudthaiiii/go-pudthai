@@ -3,11 +3,11 @@ package interactor
 import (
 	"context"
 	"errors"
-	"go-ibooking/internal/adapter/shared/dtos"
-	"go-ibooking/internal/config"
-	"go-ibooking/internal/infrastructure/cache"
-	"go-ibooking/internal/throw"
-	"go-ibooking/internal/usecase/repository"
+	"go-pudthai/internal/adapter/shared/dtos"
+	"go-pudthai/internal/config"
+	"go-pudthai/internal/infrastructure/cache"
+	"go-pudthai/internal/throw"
+	"go-pudthai/internal/usecase/repository"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -46,6 +46,14 @@ type SharedAuthInteractor interface {
 func (s *sharedAuthInteractor) Login(ctx context.Context, dto dtos.Login, userType string) (dtos.AuthJWT, error) {
 	user, err := s.userRepo.FindUserByEmail(ctx, dto.Email, userType)
 	if err != nil {
+		return dtos.AuthJWT{}, throw.UserCredentialMismatch()
+	}
+
+	if user.IsActive == 0 {
+		return dtos.AuthJWT{}, throw.UserCredentialMismatch()
+	}
+
+	if !user.EmailVerifiedAt.Valid {
 		return dtos.AuthJWT{}, throw.UserCredentialMismatch()
 	}
 

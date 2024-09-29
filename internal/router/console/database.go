@@ -1,8 +1,8 @@
 package router
 
 import (
-	cc "go-ibooking/internal/adapter/console/controllers"
-	t "go-ibooking/internal/model/technical"
+	cc "go-pudthai/internal/adapter/console/controllers"
+	t "go-pudthai/internal/model/technical"
 )
 
 func addDatabaseRoute(c cc.DatabaseController) t.Routes {

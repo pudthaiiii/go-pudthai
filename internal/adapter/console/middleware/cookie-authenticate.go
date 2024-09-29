@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	t "go-ibooking/internal/model/technical"
+	t "go-pudthai/internal/model/technical"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"

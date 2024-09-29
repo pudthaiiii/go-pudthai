@@ -2,9 +2,9 @@ package repository
 
 import (
 	"context"
-	"go-ibooking/internal/entities"
-	"go-ibooking/internal/model/dtos"
-	t "go-ibooking/internal/model/technical"
+	"go-pudthai/internal/entities"
+	"go-pudthai/internal/model/dtos"
+	t "go-pudthai/internal/model/technical"
 	"strconv"
 
 	"gorm.io/gorm"

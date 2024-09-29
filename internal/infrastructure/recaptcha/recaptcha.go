@@ -3,8 +3,8 @@ package recaptcha
 import (
 	"encoding/json"
 	"fmt"
-	"go-ibooking/internal/config"
-	"go-ibooking/internal/infrastructure/logger"
+	"go-pudthai/internal/config"
+	"go-pudthai/internal/infrastructure/logger"
 	"io/ioutil"
 	"net/http"
 )

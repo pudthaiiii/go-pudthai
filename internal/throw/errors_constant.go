@@ -2,7 +2,7 @@ package throw
 
 import (
 	"fmt"
-	"go-ibooking/internal/infrastructure/logger"
+	"go-pudthai/internal/infrastructure/logger"
 )
 
 var ErrorCodes = map[int]string{
@@ -14,6 +14,8 @@ var ErrorCodes = map[int]string{
 	910001: "GORM_ERROR",
 	910002: "INSUFFICIENT_ABILITY",
 	910003: "UPLOADER_ERROR",
+	910004: "VALIDATE_RECAPTCHA_ERROR",
+	910005: "RECAPTCHA_ERROR",
 
 	// Auth
 	100001: "AUTH_CREDENTIAL_MISMATCH",
@@ -22,8 +24,6 @@ var ErrorCodes = map[int]string{
 	100004: "AUTH_REFRESH_TOKEN_ERROR",
 	100005: "AUTH_ACCOUNT_TEMPORARY_LOCKED",
 	100006: "AUTH_REACHED_WARNING_ATTEMPT",
-	100007: "AUTH_VERIFY_AND_LOGIN_VIA_AZURE_AD_ERROR",
-	100008: "AUTH_USER_NOT_FOUND_DUE_TO_AD_SETTING",
 
 	// Roles
 	910101: "ROLE_CREATE_ERROR",
@@ -52,4 +52,12 @@ func Error(code int, err error) error {
 	logger.Log.Err(err).Msg(msg)
 
 	return fmt.Errorf(msg)
+}
+
+func ValidateRecaptchaError() error {
+	return Error(910004, nil)
+}
+
+func RecaptchaError() error {
+	return Error(910005, nil)
 }

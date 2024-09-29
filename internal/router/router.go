@@ -1,20 +1,21 @@
 package router
 
 import (
-	_ "go-ibooking/docs"
-	ra "go-ibooking/internal/router/admin"
-	rb "go-ibooking/internal/router/backend"
-	rc "go-ibooking/internal/router/console"
-	rf "go-ibooking/internal/router/frontend"
-
-	"go-ibooking/internal/registry"
+	_ "go-pudthai/docs"
+	"go-pudthai/internal/registry"
+	ra "go-pudthai/internal/router/admin"
+	rb "go-pudthai/internal/router/backend"
+	rc "go-pudthai/internal/router/console"
+	rf "go-pudthai/internal/router/frontend"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/swagger"
+	"go.elastic.co/apm/module/apmfiber"
 )
 
 func InitializeRoute(fiber *fiber.App, r registry.Registry) *fiber.App {
+	fiber.Static("/static", "./public")
 	fiber.Get("/swagger/*", swagger.HandlerDefault)
 
 	appleMiddlewares(fiber)
@@ -35,8 +36,11 @@ func InitializeRoute(fiber *fiber.App, r registry.Registry) *fiber.App {
 }
 
 func appleMiddlewares(fiber *fiber.App) {
+
+	fiber.Use(apmfiber.Middleware())
+
 	fiber.Use(cors.New(cors.Config{
-		AllowOrigins: "https://example.com",
+		AllowOrigins: "*",
 		AllowMethods: "GET,POST,HEAD,PUT,DELETE",
 	}))
 }

@@ -1,9 +1,10 @@
 package middleware
 
 import (
-	"go-ibooking/internal/config"
-	"go-ibooking/internal/infrastructure/cache"
-	"go-ibooking/internal/usecase/repository"
+	"go-pudthai/internal/config"
+	"go-pudthai/internal/infrastructure/cache"
+	"go-pudthai/internal/infrastructure/recaptcha"
+	"go-pudthai/internal/usecase/repository"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
@@ -11,19 +12,26 @@ import (
 
 type middleware struct {
 	merchantRepo repository.MerchantsRepository
+	recaptcha    *recaptcha.RecaptchaProvider
+	cfg          *config.Config
 }
 
 func NewSharedMiddleware(
 	cfg *config.Config,
 	cacheManager *cache.CacheManager,
 	db *gorm.DB,
+	recaptcha *recaptcha.RecaptchaProvider,
 ) Middleware {
 	return &middleware{
 		merchantRepo: repository.NewMerchantsRepository(db),
+		recaptcha:    recaptcha,
+		cfg:          cfg,
 	}
 }
 
 type Middleware interface {
 	Authenticate(handler fiber.Handler, action string, subject string) fiber.Handler
 	RequiredMerchant(handler fiber.Handler, action string, subject string) fiber.Handler
+	GoogleRecaptcha(handler fiber.Handler, action string, subject string) fiber.Handler
+	Log(handler fiber.Handler, name string, action string, subject string) fiber.Handler
 }

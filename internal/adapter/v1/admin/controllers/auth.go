@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"go-ibooking/internal/adapter/shared"
-	"go-ibooking/internal/adapter/shared/dtos"
-	t "go-ibooking/internal/model/technical"
-	is "go-ibooking/internal/usecase/interactor/shared"
-	"go-ibooking/internal/validator"
+	"go-pudthai/internal/adapter/shared"
+	"go-pudthai/internal/adapter/shared/dtos"
+	t "go-pudthai/internal/model/technical"
+	is "go-pudthai/internal/usecase/interactor/shared"
+	"go-pudthai/internal/validator"
 
 	"github.com/gofiber/fiber/v2"
 )

@@ -1,9 +1,9 @@
 package router
 
 import (
-	cc "go-ibooking/internal/adapter/console/controllers"
-	cm "go-ibooking/internal/adapter/console/middleware"
-	"go-ibooking/internal/model/technical"
+	cc "go-pudthai/internal/adapter/console/controllers"
+	cm "go-pudthai/internal/adapter/console/middleware"
+	"go-pudthai/internal/model/technical"
 
 	"github.com/gofiber/fiber/v2"
 )

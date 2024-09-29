@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"go-ibooking/internal/adapter/shared/dtos"
-	t "go-ibooking/internal/model/technical"
-	"go-ibooking/internal/throw"
-	"go-ibooking/internal/utils"
+	"go-pudthai/internal/adapter/shared/dtos"
+	t "go-pudthai/internal/model/technical"
+	"go-pudthai/internal/throw"
+	"go-pudthai/internal/utils"
 	"strings"
 	"time"
 
@@ -41,6 +41,7 @@ func (s *sharedAuthInteractor) generateJwt(ctx context.Context, userType string,
 func (s *sharedAuthInteractor) signJwt(payload map[string]interface{}, userType string, expiresIn string) (string, error) {
 	secret := s.getSecret(userType)
 
+	fmt.Println(secret, userType)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"exp": time.Now().Add(time.Hour * time.Duration(utils.StringToInt(expiresIn))).Unix(),
 		"iat": time.Now().Unix(),

@@ -1,7 +1,7 @@
 package registry
 
 import (
-	i "go-ibooking/internal/usecase/interactor/shared"
+	i "go-pudthai/internal/usecase/interactor/shared"
 )
 
 func (r *registry) NewSharedAuthInteractor() i.SharedAuthInteractor {

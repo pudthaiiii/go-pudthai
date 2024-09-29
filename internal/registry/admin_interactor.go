@@ -1,7 +1,7 @@
 package registry
 
 import (
-	i "go-ibooking/internal/usecase/interactor/admin"
+	i "go-pudthai/internal/usecase/interactor/admin"
 )
 
 func (r *registry) NewAdminUsersInteractor() i.UsersInteractor {

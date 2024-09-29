@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>reCAPTCHA Test</title>
+  <script src="https://www.google.com/recaptcha/api.js?render=6Ld0oz8qAAAAALU83TJG46RBhiWW1UWYMSvwecoL"></script>
+</head>
+
+<body>
+  <form id="recaptchaForm" action="submit_form.php" method="POST">
+    <button class="g-recaptcha" data-sitekey="6Ld0oz8qAAAAALU83TJG46RBhiWW1UWYMSvwecoL" data-callback='onSubmit'
+      data-action='submit'>Submit</button>
+  </form>
+
+  <script>
+    function onSubmit ( e ) {
+      console.log( e )
+      e.preventDefault();
+      grecaptcha.ready( function () {
+        grecaptcha.execute( 'reCAPTCHA_site_key', { action: 'submit' } ).then( function ( token ) {
+          console.log( token );
+        } );
+      } );
+    }
+  </script>
+
+</body>
+
+</html>

@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"go-ibooking/internal/entities"
+	"go-pudthai/internal/entities"
 
 	"gorm.io/gorm"
 )

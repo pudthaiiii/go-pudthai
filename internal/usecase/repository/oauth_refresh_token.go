@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 	"fmt"
-	"go-ibooking/internal/entities"
-	b "go-ibooking/internal/model/business"
+	"go-pudthai/internal/entities"
+	b "go-pudthai/internal/model/business"
 	"time"
 
 	"gorm.io/gorm"
