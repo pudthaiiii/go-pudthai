@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"go-ibooking/internal/entities"
+	b "go-ibooking/internal/model/business"
 	"time"
 
 	"github.com/google/uuid"
@@ -73,4 +74,22 @@ func (r *oauthAccessTokenRepository) CreateTransaction(ctx context.Context, user
 	}
 
 	return accessToken, refreshToken, nil
+}
+
+func (r *oauthAccessTokenRepository) FindByToken(ctx context.Context, token string) (b.RefreshTokenResult, error) {
+	var (
+		refreshTokenResult b.RefreshTokenResult
+	)
+
+	query := r.db.WithContext(ctx).
+		Joins("JOIN oauth_access_tokens ON oauth_access_tokens.id = oauth_refresh_tokens.oauth_access_token_id").
+		Joins("JOIN users ON oauth_access_tokens.user_id = users.id").
+		Select("oauth_refresh_tokens.id, oauth_refresh_tokens.token, oauth_refresh_tokens.expires_at, oauth_access_tokens.user_id, users.type").
+		Where("oauth_refresh_tokens.token = ?", token).
+		First(&refreshTokenResult)
+	if query.Error != nil {
+		return b.RefreshTokenResult{}, query.Error
+	}
+
+	return refreshTokenResult, nil
 }

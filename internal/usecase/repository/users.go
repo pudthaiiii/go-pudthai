@@ -2,10 +2,9 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"go-ibooking/internal/entities"
-	"go-ibooking/internal/enum"
 	"go-ibooking/internal/model/dtos"
+	t "go-ibooking/internal/model/technical"
 	"strconv"
 
 	"gorm.io/gorm"
@@ -38,8 +37,8 @@ func (r *usersRepository) CreateAdminUser(ctx context.Context, dto dtos.CreateUs
 		Type:         userType,
 	}
 
-	if userType != string(enum.ADMIN) {
-		merchantID, ok := ctx.Value("MerchantID").(string)
+	if userType != string(t.ADMIN) {
+		merchantID, ok := ctx.Value(t.MerchantIDKey).(string)
 		if ok {
 			merchantIDUint, err := strconv.ParseUint(merchantID, 10, 32)
 			if err != nil {
@@ -61,18 +60,13 @@ func (r *usersRepository) CreateAdminUser(ctx context.Context, dto dtos.CreateUs
 func (r *usersRepository) FindUserByEmail(ctx context.Context, email string, userType string) (entities.User, error) {
 	var user entities.User
 
-	Test := ctx.Value("TestMM")
-	Test1 := ctx.Value("MerchantID")
-	fmt.Println("Test", Test, Test1)
-
-	fmt.Println("FInd")
 	query := r.db.WithContext(ctx).Where("LOWER(email) = LOWER(?)", email)
 
 	if userType != "" {
 		query = query.Where("UPPER(type) = UPPER(?)", userType)
 	}
 
-	merchantID, ok := ctx.Value("MerchantID").(string)
+	merchantID, ok := ctx.Value(t.MerchantIDKey).(string)
 	if ok {
 		query = query.Where("merchant_id = ?", merchantID)
 	}

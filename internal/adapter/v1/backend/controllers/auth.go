@@ -3,7 +3,7 @@ package controllers
 import (
 	"go-ibooking/internal/adapter/shared"
 	"go-ibooking/internal/adapter/shared/dtos"
-	"go-ibooking/internal/enum"
+	t "go-ibooking/internal/model/technical"
 	is "go-ibooking/internal/usecase/interactor/shared"
 	"go-ibooking/internal/validator"
 
@@ -26,12 +26,12 @@ type AuthController interface {
 }
 
 func (s authController) Login(c *fiber.Ctx) error {
-	req := dtos.Login{}
-	if errValidate := validator.Validate(c, &req); errValidate != nil {
+	dto := dtos.Login{}
+	if errValidate := validator.Validate(c, &dto); errValidate != nil {
 		return errValidate
 	}
 
-	result, err := s.authInteractor.Login(c.Context(), req, string(enum.MERCHANT))
+	result, err := s.authInteractor.Login(c.Context(), dto, string(t.MERCHANT))
 	if err != nil {
 		return err
 	}
@@ -40,12 +40,12 @@ func (s authController) Login(c *fiber.Ctx) error {
 }
 
 func (s authController) Refresh(c *fiber.Ctx) error {
-	req := dtos.Refresh{}
-	if errValidate := validator.Validate(c, &req); errValidate != nil {
+	dto := dtos.Refresh{}
+	if errValidate := validator.Validate(c, &dto); errValidate != nil {
 		return errValidate
 	}
 
-	result, err := s.authInteractor.Refresh(c.Context(), req, string(enum.MERCHANT))
+	result, err := s.authInteractor.Refresh(c.Context(), dto, string(t.MERCHANT))
 	if err != nil {
 		return err
 	}

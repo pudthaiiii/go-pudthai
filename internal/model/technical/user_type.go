@@ -1,4 +1,4 @@
-package enum
+package technical
 
 type UserTypeEnum string
 

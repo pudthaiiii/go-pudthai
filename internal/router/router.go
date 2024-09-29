@@ -2,10 +2,10 @@ package router
 
 import (
 	_ "go-ibooking/docs"
-	ra "go-ibooking/internal/infrastructure/router/admin"
-	rb "go-ibooking/internal/infrastructure/router/backend"
-	rc "go-ibooking/internal/infrastructure/router/console"
-	rf "go-ibooking/internal/infrastructure/router/frontend"
+	ra "go-ibooking/internal/router/admin"
+	rb "go-ibooking/internal/router/backend"
+	rc "go-ibooking/internal/router/console"
+	rf "go-ibooking/internal/router/frontend"
 
 	"go-ibooking/internal/registry"
 

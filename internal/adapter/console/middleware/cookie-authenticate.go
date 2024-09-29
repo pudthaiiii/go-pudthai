@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"go-ibooking/internal/enum/permission"
+	t "go-ibooking/internal/model/technical"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -9,7 +9,7 @@ import (
 
 func (m *middleware) CookieAuthenticate(handler fiber.Handler, action string, subject string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		if action == string(permission.COOKIE) && subject == string(permission.CONSOLE) {
+		if action == string(t.COOKIE) && subject == string(t.CONSOLE) {
 			headerCookie := c.Get("Cookie", "")
 			cookiePairs := strings.Split(headerCookie, "; ")
 			cookieBag := make(map[string]string)

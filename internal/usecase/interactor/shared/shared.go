@@ -5,9 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"go-ibooking/internal/adapter/shared/dtos"
-	"go-ibooking/internal/enum"
+	t "go-ibooking/internal/model/technical"
 	"go-ibooking/internal/throw"
 	"go-ibooking/internal/utils"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -77,13 +78,14 @@ func (s *sharedAuthInteractor) decodeJwt(tokenString string, userType string) (m
 
 // getSecret gets jwt secret
 func (s *sharedAuthInteractor) getSecret(userType string) string {
-	switch userType {
-	case string(enum.USER):
+	switch strings.ToUpper(userType) {
+	case strings.ToUpper(string(t.USER)):
 		return s.cfg.Get("JWT")["JwtSecret"].(string)
-	case string(enum.ADMIN):
+	case strings.ToUpper(string(t.ADMIN)):
 		return s.cfg.Get("JWT")["JwtSecretAdmin"].(string)
-	case string(enum.MERCHANT):
+	case strings.ToUpper(string(t.MERCHANT)):
 		return s.cfg.Get("JWT")["JwtSecretBackend"].(string)
 	}
+
 	return ""
 }

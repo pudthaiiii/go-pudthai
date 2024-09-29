@@ -3,19 +3,12 @@ package middleware
 import (
 	"context"
 	"fmt"
+	"go-ibooking/internal/model/technical"
 	"go-ibooking/internal/throw"
 	"strconv"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-)
-
-type contextKey string
-
-const (
-	merchantIDKey contextKey = "MerchantID"
-	merchantKey   contextKey = "Merchant"
-	testMM        contextKey = "TestMM"
 )
 
 func (m *middleware) RequiredMerchant(handler fiber.Handler, action string, subject string) fiber.Handler {
@@ -39,11 +32,11 @@ func (m *middleware) RequiredMerchant(handler fiber.Handler, action string, subj
 			return throw.MerchantNotFound()
 		}
 
-		c.Locals("Merchant", merchant)
-		c.Locals("MerchantID", merchantID)
+		c.Locals(technical.MerchantKey, merchant)
+		c.Locals(technical.MerchantIDKey, merchantID)
 
-		ctx := context.WithValue(c.Context(), merchantIDKey, merchantID)
-		ctx = context.WithValue(ctx, merchantKey, merchant)
+		ctx := context.WithValue(c.Context(), technical.MerchantIDKey, merchantID)
+		ctx = context.WithValue(ctx, technical.MerchantKey, merchant)
 
 		c.SetUserContext(ctx)
 
@@ -53,13 +46,13 @@ func (m *middleware) RequiredMerchant(handler fiber.Handler, action string, subj
 
 func (m *middleware) Authenticate(handler fiber.Handler, action string, subject string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// Get user from context
 		fmt.Println("Get user from context", action, subject)
 
-		c.Locals(testMM, "Test1")
-		ctx := context.WithValue(c.Context(), testMM, "Test1")
+		c.Locals(technical.MemberKey, "Test1")
+		ctx := context.WithValue(c.Context(), technical.MemberKey, "Test1")
 
 		c.SetUserContext(ctx)
+
 		return handler(c)
 	}
 }

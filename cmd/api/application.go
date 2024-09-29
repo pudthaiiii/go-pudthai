@@ -8,8 +8,8 @@ import (
 	"go-ibooking/internal/infrastructure/logger"
 	"go-ibooking/internal/infrastructure/mailer"
 	"go-ibooking/internal/infrastructure/recaptcha"
-	"go-ibooking/internal/infrastructure/router"
 	"go-ibooking/internal/registry"
+	"go-ibooking/internal/router"
 	"log"
 	"time"
 

@@ -1,4 +1,4 @@
-package permission
+package technical
 
 type Action string
 type Subject string

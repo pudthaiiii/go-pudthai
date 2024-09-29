@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"go-ibooking/internal/enum"
 	"go-ibooking/internal/events"
 	"go-ibooking/internal/infrastructure/datastore"
 	"go-ibooking/internal/model/dtos"
+	t "go-ibooking/internal/model/technical"
 	"go-ibooking/internal/throw"
 	"go-ibooking/internal/usecase/repository"
 	"mime/multipart"
@@ -71,11 +71,11 @@ func (u *usersInteractor) Create(ctx context.Context, dto dtos.CreateUser, file 
 }
 
 func resolveUserTypeAndMerchantID(userType string) (string, uint) {
-	switch enum.UserTypeEnum(strings.ToUpper(userType)) {
-	case enum.ADMIN:
-		return string(enum.ADMIN), 0
-	case enum.MERCHANT:
-		return string(enum.MERCHANT), 99
+	switch t.UserTypeEnum(strings.ToUpper(userType)) {
+	case t.ADMIN:
+		return string(t.ADMIN), 0
+	case t.MERCHANT:
+		return string(t.MERCHANT), 99
 	default:
 		return "User", 99
 	}
@@ -98,10 +98,10 @@ func hashPassword(password string) (string, error) {
 }
 
 func (u *usersInteractor) emitUserCreatedEvent(userType string, user interface{}) {
-	switch enum.UserTypeEnum(strings.ToUpper(userType)) {
-	case enum.ADMIN:
+	switch t.UserTypeEnum(strings.ToUpper(userType)) {
+	case t.ADMIN:
 		events.Emit(u.listener, "admin.created", user)
-	case enum.MERCHANT:
+	case t.MERCHANT:
 		events.Emit(u.listener, "merchant.created", user)
 	default:
 		events.Emit(u.listener, "user.created", user)
