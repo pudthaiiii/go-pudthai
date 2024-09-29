@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"go-pudthai/internal/adapter/v1/admin/dtos"
 	"go-pudthai/internal/events"
 	"go-pudthai/internal/infrastructure/datastore"
-	"go-pudthai/internal/model/dtos"
 	t "go-pudthai/internal/model/technical"
 	"go-pudthai/internal/throw"
 	"go-pudthai/internal/usecase/repository"
@@ -38,6 +38,10 @@ type UsersInteractor interface {
 }
 
 func (u *usersInteractor) Create(ctx context.Context, dto dtos.CreateUser, file *multipart.FileHeader) (dtos.ResponseUserID, error) {
+
+	fmt.Println(ctx.Value(t.Merchant),
+		ctx.Value(t.MerchantID),
+		ctx.Value(t.Member))
 	var createUser dtos.ResponseUserID
 
 	userType, merchantID := resolveUserTypeAndMerchantID(dto.Type)

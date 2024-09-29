@@ -1,7 +1,7 @@
 package throw
 
 func UserCreate(err error) error {
-	return Error(910201, err)
+	return Error(910201, err, 500)
 }
 
 func UserExists() error {
@@ -9,9 +9,9 @@ func UserExists() error {
 }
 
 func UserError(err error) error {
-	return Error(910203, err)
+	return Error(910203, err, 500)
 }
 
 func UserNotFound() error {
-	return Error(910204, nil)
+	return Error(910204, nil, 404)
 }

@@ -1,10 +1,5 @@
 package throw
 
-import (
-	"fmt"
-	"go-pudthai/internal/infrastructure/logger"
-)
-
 var ErrorCodes = map[int]string{
 	0:      "UNDEFINED_ERROR",
 	900400: "BAD_REQUEST",
@@ -26,38 +21,16 @@ var ErrorCodes = map[int]string{
 	100006: "AUTH_REACHED_WARNING_ATTEMPT",
 
 	// Roles
-	910101: "ROLE_CREATE_ERROR",
+	910101: "ROLE_CREATE_GORM_ERROR",
 	910102: "ROLE_PAGINATION_ERROR",
 	910103: "ROLE_NOT_FOUND",
 
 	// Users
-	910201: "USER_CREATE_ERROR",
+	910201: "USER_CREATE_GORM_ERROR",
 	910202: "USER_EMAIL_EXISTS",
-	910203: "USER_ERROR",
+	910203: "USER_GORM_ERROR",
 	910204: "USER_NOT_FOUND",
 
 	// Merchant
 	910301: "MERCHANT_NOT_FOUND",
-}
-
-func Error(code int, err error) error {
-	if err == nil {
-		msg := fmt.Sprintf("[%d]: %s:", code, ErrorCodes[code])
-		logger.Log.Error().Msg(msg)
-
-		return fmt.Errorf(msg)
-	}
-
-	msg := fmt.Sprintf("[%d]: %s: %s", code, ErrorCodes[code], err.Error())
-	logger.Log.Err(err).Msg(msg)
-
-	return fmt.Errorf(msg)
-}
-
-func ValidateRecaptchaError() error {
-	return Error(910004, nil)
-}
-
-func RecaptchaError() error {
-	return Error(910005, nil)
 }

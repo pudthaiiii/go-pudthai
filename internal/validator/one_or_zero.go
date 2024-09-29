@@ -8,11 +8,21 @@ Package validator เป็น package ที่ใช้สำหรับก�
 */
 package validator
 
-import "github.com/go-playground/validator/v10"
+import (
+	ut "github.com/go-playground/universal-translator"
+	"github.com/go-playground/validator/v10"
+)
 
 // ฟังก์ชัน init สำหรับลงทะเบียน custom validation "oneOrZero"
 func init() {
-	validate.RegisterValidation("oneOrZero", validateOneOrZero)
+	validate.RegisterValidation("one_or_zero", validateOneOrZero)
+
+	validate.RegisterTranslation("one_or_zero", trans, func(ut ut.Translator) error {
+		return ut.Add("one_or_zero", "{0} must be either 0 or 1", true)
+	}, func(ut ut.Translator, fe validator.FieldError) string {
+		t, _ := ut.T("one_or_zero", fe.Field())
+		return t
+	})
 }
 
 // ฟังก์ชัน validateOneOrZero ใช้ตรวจสอบว่า ค่าที่ตรวจสอบต้องเป็น 0 หรือ 1 เท่านั้น

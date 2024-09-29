@@ -11,9 +11,10 @@ import (
 )
 
 type middleware struct {
-	merchantRepo repository.MerchantsRepository
-	recaptcha    *recaptcha.RecaptchaProvider
-	cfg          *config.Config
+	merchantRepo    repository.MerchantsRepository
+	accessTokenRepo repository.OauthAccessTokenRepository
+	recaptcha       *recaptcha.RecaptchaProvider
+	cfg             *config.Config
 }
 
 func NewSharedMiddleware(
@@ -23,9 +24,10 @@ func NewSharedMiddleware(
 	recaptcha *recaptcha.RecaptchaProvider,
 ) Middleware {
 	return &middleware{
-		merchantRepo: repository.NewMerchantsRepository(db),
-		recaptcha:    recaptcha,
-		cfg:          cfg,
+		merchantRepo:    repository.NewMerchantsRepository(db),
+		accessTokenRepo: repository.NewOauthAccessTokenRepository(db),
+		recaptcha:       recaptcha,
+		cfg:             cfg,
 	}
 }
 

@@ -1,6 +1,8 @@
 package shared
 
 import (
+	"go-pudthai/internal/model/technical"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -15,25 +17,21 @@ type successResponse struct {
 	Status     Status      `json:"status"`
 }
 
-func Success(c *fiber.Ctx, data, pagination interface{}) error {
-	statusCode := getStatus(c)
+func Success(c *fiber.Ctx, data, pagination interface{}, statusCode ...int) error {
+	defaultStatusCode := 200
+
+	if len(statusCode) > 0 {
+		defaultStatusCode = statusCode[0]
+	}
 
 	response := successResponse{
 		Status: Status{
-			Code:    statusCode,
-			Message: "OK",
+			Code:    defaultStatusCode,
+			Message: technical.HttpStatusMessages[defaultStatusCode],
 		},
 		Data:       data,
 		Pagination: pagination,
 	}
 
-	return c.Status(statusCode).JSON(response)
-}
-
-func getStatus(c *fiber.Ctx) int {
-	if c.Route().Name == "Create" {
-		return fiber.StatusCreated
-	}
-
-	return fiber.StatusOK
+	return c.Status(defaultStatusCode).JSON(response)
 }

@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 	"go-pudthai/internal/entities"
-	b "go-pudthai/internal/model/business"
+	"go-pudthai/internal/model/business"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jinzhu/copier"
 	"gorm.io/gorm"
 )
 
@@ -21,6 +22,7 @@ func NewOauthAccessTokenRepository(db *gorm.DB) OauthAccessTokenRepository {
 
 type OauthAccessTokenRepository interface {
 	CreateTransaction(ctx context.Context, userID uint, accessExpiresAt string, refreshExpiresAt string) (entities.OauthAccessToken, entities.OauthRefreshToken, error)
+	FindUserByToken(ctx context.Context, token string) (business.GetUserResult, error)
 }
 
 func (r *oauthAccessTokenRepository) CreateTransaction(ctx context.Context, userID uint, accessExpiresAt string, refreshExpiresAt string) (entities.OauthAccessToken, entities.OauthRefreshToken, error) {
@@ -76,20 +78,22 @@ func (r *oauthAccessTokenRepository) CreateTransaction(ctx context.Context, user
 	return accessToken, refreshToken, nil
 }
 
-func (r *oauthAccessTokenRepository) FindByToken(ctx context.Context, token string) (b.RefreshTokenResult, error) {
+func (r *oauthAccessTokenRepository) FindUserByToken(ctx context.Context, token string) (business.GetUserResult, error) {
 	var (
-		refreshTokenResult b.RefreshTokenResult
+		accessToken entities.OauthAccessToken
+		result      business.GetUserResult
 	)
 
 	query := r.db.WithContext(ctx).
-		Joins("JOIN oauth_access_tokens ON oauth_access_tokens.id = oauth_refresh_tokens.oauth_access_token_id").
-		Joins("JOIN users ON oauth_access_tokens.user_id = users.id").
-		Select("oauth_refresh_tokens.id, oauth_refresh_tokens.token, oauth_refresh_tokens.expires_at, oauth_access_tokens.user_id, users.type").
-		Where("oauth_refresh_tokens.token = ?", token).
-		First(&refreshTokenResult)
+		Preload("User").
+		Where("token = ? AND expires_at > ?", token, time.Now()).
+		First(&accessToken)
+
 	if query.Error != nil {
-		return b.RefreshTokenResult{}, query.Error
+		return business.GetUserResult{}, query.Error
 	}
 
-	return refreshTokenResult, nil
+	copier.Copy(&result, accessToken.User)
+
+	return result, nil
 }
