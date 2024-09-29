@@ -2,10 +2,9 @@ package repository
 
 import (
 	"context"
+	"go-pudthai/internal/adapter/v1/admin/dtos"
 	"go-pudthai/internal/entities"
-	"go-pudthai/internal/model/dtos"
 	t "go-pudthai/internal/model/technical"
-	"strconv"
 
 	"gorm.io/gorm"
 )
@@ -37,17 +36,21 @@ func (r *usersRepository) CreateAdminUser(ctx context.Context, dto dtos.CreateUs
 		Type:         userType,
 	}
 
-	if userType != string(t.ADMIN) {
-		merchantID, ok := ctx.Value(t.MerchantIDKey).(string)
-		if ok {
-			merchantIDUint, err := strconv.ParseUint(merchantID, 10, 32)
-			if err != nil {
-				return user, err
-			}
-
-			user.MerchantID = uint(merchantIDUint)
-		}
+	if dto.MerchantID != 0 {
+		user.MerchantID = dto.MerchantID
 	}
+
+	// if userType != string(t.ADMIN) {
+	// 	merchantID, ok := ctx.Value(t.MerchantID).(string)
+	// 	if ok {
+	// 		merchantIDUint, err := strconv.ParseUint(merchantID, 10, 32)
+	// 		if err != nil {
+	// 			return user, err
+	// 		}
+
+	// 		user.MerchantID = uint(merchantIDUint)
+	// 	}
+	// }
 
 	query := r.db.WithContext(ctx).Create(&user)
 	if query.Error != nil {
@@ -66,7 +69,7 @@ func (r *usersRepository) FindUserByEmail(ctx context.Context, email string, use
 		query = query.Where("UPPER(type) = UPPER(?)", userType)
 	}
 
-	merchantID, ok := ctx.Value(t.MerchantIDKey).(string)
+	merchantID, ok := ctx.Value(t.MerchantID).(string)
 	if ok {
 		query = query.Where("merchant_id = ?", merchantID)
 	}

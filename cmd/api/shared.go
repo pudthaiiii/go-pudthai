@@ -10,7 +10,8 @@ package api
 
 import (
 	"encoding/json"
-	"go-pudthai/internal/utils"
+	"fmt"
+	"go-pudthai/internal/model/technical"
 	"net/http"
 	"os"
 	"strconv"
@@ -19,92 +20,93 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-// validationError โครงสร้างสำหรับเก็บข้อผิดพลาดในการตรวจสอบข้อมูล
 type validationError struct {
-	Errors  map[string][]string `json:"errors"`  // แผนที่ของข้อผิดพลาด
-	Message string              `json:"message"` // ข้อความของข้อผิดพลาด
+	Errors  map[string][]string `json:"errors"`
+	Message string              `json:"message"`
+}
+
+type errorConstant struct {
+	Code    int    `json:"code"`
+	Error   string `json:"error"`
+	Message string `json:"message"`
 }
 
 // errorHandler จัดการข้อผิดพลาดที่เกิดขึ้นในแอปพลิเคชัน
 func errorHandler(c *fiber.Ctx, err error) error {
-	// กำหนดค่าพื้นฐานสำหรับสถานะข้อผิดพลาด
-	statusCode, errorCode, errorMessage, exception := http.StatusInternalServerError, 0, "Internal Server Error", []string{}
+	statusCode := http.StatusInternalServerError
+	errorCode := 0
+	errorMessage := "Internal Server Error"
+	exception := []string{}
 
-	// ตรวจสอบว่าข้อผิดพลาดคือ fiber.Error หรือไม่
 	if fiberErr, ok := err.(*fiber.Error); ok {
 		handleFiberError(fiberErr, &statusCode, &errorCode, &errorMessage, &exception)
-	} else if err != nil {
-		handleGenericError(err, &statusCode, &errorCode, &errorMessage, &exception)
+	} else {
+		handleUnexpectedError(err, &errorCode, &errorMessage, &exception)
 	}
 
-	// สร้างการตอบกลับข้อผิดพลาด
-	response := createErrorResponse(errorMessage, errorCode, exception)
-	return c.Status(statusCode).JSON(response) // ส่งการตอบกลับ JSON
+	response := createErrorResponse(statusCode, errorMessage, errorCode, exception)
+
+	return c.Status(statusCode).JSON(response)
 }
 
 // handleFiberError จัดการข้อผิดพลาดที่เกิดจาก Fiber
 func handleFiberError(err *fiber.Error, statusCode, errorCode *int, errorMessage *string, exception *[]string) {
-	*statusCode, *errorCode, *errorMessage = err.Code, err.Code, err.Message
+	*statusCode = err.Code
+	*errorCode = err.Code
+	*errorMessage = err.Message
 
-	// ตรวจสอบข้อผิดพลาดการตรวจสอบข้อมูล
 	if strings.Contains(err.Error(), "VALIDATE_ERROR") {
-		*statusCode = http.StatusUnprocessableEntity
-		*errorCode = 900422
-		*errorMessage = "VALIDATE_ERROR"
+		handleValidationError(err.Error(), statusCode, errorCode, errorMessage, exception)
+	} else {
+		handleGeneralError(errorMessage, errorCode, exception)
+	}
+}
 
-		// แปลงข้อผิดพลาด JSON เป็น validationError
-		var validationErr validationError
-		if json.Unmarshal([]byte(err.Error()), &validationErr) == nil {
-			for _, errs := range validationErr.Errors {
-				*exception = append(*exception, errs...) // เก็บข้อผิดพลาดทั้งหมด
-			}
+// handleValidationError จัดการข้อผิดพลาดการตรวจสอบข้อมูล
+func handleValidationError(errMsg string, statusCode, errorCode *int, errorMessage *string, exception *[]string) {
+	*statusCode = http.StatusUnprocessableEntity
+	*errorCode = 900422
+	*errorMessage = "VALIDATE_ERROR"
+
+	var validationErr validationError
+	if json.Unmarshal([]byte(errMsg), &validationErr) == nil {
+		for _, errs := range validationErr.Errors {
+			*exception = append(*exception, errs...)
 		}
 	}
 }
 
-// handleGenericError จัดการข้อผิดพลาดทั่วไป
-func handleGenericError(err error, statusCode, errorCode *int, errorMessage *string, exception *[]string) {
-	throwException := utils.FilterThrowExceptions(err.Error())
-	if len(throwException) > 0 {
-		*statusCode = http.StatusUnprocessableEntity
-
-		// ตรวจสอบรหัสข้อผิดพลาด
-		if len(throwException) > 1 && throwException[1] != "" {
-			*errorCode, _ = strconv.Atoi(throwException[1])
-		}
-
-		// จัดการข้อผิดพลาดเฉพาะ
-		if len(throwException) > 2 && throwException[2] != "" {
-			handleSpecificErrorCases(throwException[2], statusCode, errorMessage)
-		}
-
-		// เพิ่มข้อผิดพลาดเพิ่มเติม
-		if len(throwException) > 3 && throwException[3] != "" {
-			*exception = append(*exception, throwException[3])
+// handleGeneralError จัดการข้อผิดพลาดทั่วไป
+func handleGeneralError(errorMessage *string, errorCode *int, exception *[]string) {
+	var result errorConstant
+	if err := json.Unmarshal([]byte(*errorMessage), &result); err == nil {
+		fmt.Println("result", result.Code, result.Error, result.Message)
+		*errorCode = result.Code
+		*errorMessage = result.Message
+		if result.Error != "" {
+			*exception = append(*exception, result.Error)
 		}
 	}
 }
 
-// handleSpecificErrorCases จัดการกรณีข้อผิดพลาดเฉพาะ
-func handleSpecificErrorCases(errorDetail string, statusCode *int, errorMessage *string) {
-	// ตรวจสอบข้อผิดพลาดด้านการรับรองความถูกต้อง
-	if strings.Contains(errorDetail, "AUTH_") {
-		*statusCode = http.StatusUnauthorized
-	}
-
-	// ตรวจสอบข้อผิดพลาดที่ไม่พบ
-	if strings.Contains(errorDetail, "NOT_FOUND") {
-		*statusCode = http.StatusNotFound
-	}
-
-	*errorMessage = errorDetail
+// handleUnexpectedError จัดการข้อผิดพลาดที่ไม่คาดคิด
+func handleUnexpectedError(err error, errorCode *int, errorMessage *string, exception *[]string) {
+	*errorMessage = err.Error()
+	*exception = append(*exception, "An unexpected error occurred: "+*errorMessage)
+	*errorCode = 1000
 }
 
 // createErrorResponse สร้างการตอบกลับข้อผิดพลาด
-func createErrorResponse(errorMessage string, errorCode int, exception []string) fiber.Map {
+func createErrorResponse(statusCode int, errorMessage string, errorCode int, exception []string) fiber.Map {
 	response := fiber.Map{
-		"message": errorMessage, // ข้อความข้อผิดพลาด
-		"code":    errorCode,    // รหัสข้อผิดพลาด
+		"status": fiber.Map{
+			"code":    statusCode,
+			"message": technical.HttpStatusMessages[statusCode],
+		},
+		"error": fiber.Map{
+			"code":    errorCode,
+			"message": errorMessage,
+		},
 	}
 
 	// ตรวจสอบการตั้งค่าว่าจะบันทึกข้อผิดพลาดหรือไม่
@@ -113,8 +115,12 @@ func createErrorResponse(errorMessage string, errorCode int, exception []string)
 
 	// ถ้ามีข้อผิดพลาดเพิ่มเติมให้เพิ่มในการตอบกลับ
 	if (isEnabled && len(exception) > 0) || (isValidate && len(exception) > 0) {
-		response["errors"] = exception // เพิ่มข้อผิดพลาดลงใน response
+		if statusMap, ok := response["error"].(fiber.Map); ok {
+			if len(exception) > 0 {
+				statusMap["errors"] = exception
+			}
+		}
 	}
 
-	return response // ส่งกลับ response
+	return response
 }

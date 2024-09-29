@@ -2,7 +2,7 @@ package controllers
 
 import (
 	"go-pudthai/internal/adapter/shared"
-	"go-pudthai/internal/model/dtos"
+	"go-pudthai/internal/adapter/v1/admin/dtos"
 	ia "go-pudthai/internal/usecase/interactor/admin"
 	"go-pudthai/internal/validator"
 
@@ -23,17 +23,6 @@ type UsersController interface {
 	Create(c *fiber.Ctx) error
 }
 
-// Create godoc
-// @Summary Create a new user
-// @Description Create a new user
-// @Tags Users
-// @Accept json
-// @Produce json
-// @Param avatar formData file false "User avatar"
-// @Param email formData string true "User email"
-// @Param password formData string true "User password"
-// @Success 200 {object} dtos.ResponseUserID
-// @Router /v1/users [post]
 func (u usersController) Create(c *fiber.Ctx) error {
 	req := dtos.CreateUser{}
 	file, _ := c.FormFile("avatar")
@@ -47,5 +36,5 @@ func (u usersController) Create(c *fiber.Ctx) error {
 		return err
 	}
 
-	return shared.Success(c, result, nil)
+	return shared.Success(c, result, nil, fiber.StatusCreated)
 }

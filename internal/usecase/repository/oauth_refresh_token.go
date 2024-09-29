@@ -25,7 +25,7 @@ type OauthRefreshTokenRepository interface {
 
 func (r *oauthRefreshTokenRepository) FindByToken(ctx context.Context, token string) (b.RefreshTokenResult, error) {
 	var (
-		refreshTokenResult b.RefreshTokenResult
+		refreshToken b.RefreshTokenResult
 	)
 
 	query := r.db.WithContext(ctx).
@@ -33,12 +33,13 @@ func (r *oauthRefreshTokenRepository) FindByToken(ctx context.Context, token str
 		Joins("JOIN users ON oauth_access_tokens.user_id = users.id").
 		Select("oauth_refresh_tokens.id, oauth_refresh_tokens.token, oauth_refresh_tokens.expires_at, oauth_access_tokens.user_id, users.type").
 		Where("oauth_refresh_tokens.token = ? AND oauth_refresh_tokens.expires_at > ?", token, time.Now()).
-		First(&refreshTokenResult)
+		First(&refreshToken)
+
 	if query.Error != nil {
 		return b.RefreshTokenResult{}, query.Error
 	}
 
-	return refreshTokenResult, nil
+	return refreshToken, nil
 }
 
 func (r *oauthRefreshTokenRepository) DeleteByID(ctx context.Context, id uint) error {

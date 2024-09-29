@@ -1,5 +1,5 @@
 package throw
 
 func MerchantNotFound() error {
-	return Error(910301, nil)
+	return Error(910301, nil, 404)
 }
