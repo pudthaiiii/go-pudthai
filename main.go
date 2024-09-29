@@ -1,7 +1,12 @@
 package main
 
-import "github.com/pudthaiiii/golang-cms/src/bootstrap"
+import (
+	"go-pudthai/cmd/api"
+)
 
 func main() {
-	bootstrap.Boot()
+	application := api.NewApiApplication()
+	application.DeferClose()
+
+	application.Boot()
 }
