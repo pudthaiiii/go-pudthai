@@ -40,18 +40,6 @@ func (r *usersRepository) CreateAdminUser(ctx context.Context, dto dtos.CreateUs
 		user.MerchantID = dto.MerchantID
 	}
 
-	// if userType != string(t.ADMIN) {
-	// 	merchantID, ok := ctx.Value(t.MerchantID).(string)
-	// 	if ok {
-	// 		merchantIDUint, err := strconv.ParseUint(merchantID, 10, 32)
-	// 		if err != nil {
-	// 			return user, err
-	// 		}
-
-	// 		user.MerchantID = uint(merchantIDUint)
-	// 	}
-	// }
-
 	query := r.db.WithContext(ctx).Create(&user)
 	if query.Error != nil {
 		return user, query.Error

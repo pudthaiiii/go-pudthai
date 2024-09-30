@@ -3,10 +3,11 @@ package middleware
 import (
 	"go-pudthai/internal/throw"
 	"go-pudthai/internal/utils"
-	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
+
+var routeNotAllow = []string{"Login", "Refresh"}
 
 func (m *middleware) GoogleRecaptcha(handler fiber.Handler, action string, subject string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -46,5 +47,11 @@ func (m *middleware) verifyRecaptchaToken(token string) error {
 }
 
 func isAuthRoute(routeName string) bool {
-	return strings.Contains(routeName, "Login") || strings.Contains(routeName, "Refresh")
+	for _, route := range routeNotAllow {
+		if route == routeName {
+			return true
+		}
+	}
+
+	return false
 }

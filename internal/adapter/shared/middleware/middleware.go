@@ -35,5 +35,4 @@ type Middleware interface {
 	Authenticate(handler fiber.Handler, action string, subject string) fiber.Handler
 	RequiredMerchant(handler fiber.Handler, action string, subject string) fiber.Handler
 	GoogleRecaptcha(handler fiber.Handler, action string, subject string) fiber.Handler
-	Log(handler fiber.Handler, name string, action string, subject string) fiber.Handler
 }

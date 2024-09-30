@@ -21,7 +21,6 @@ func InitializeAdminRoute(app *fiber.App, c ac.AdminController, sm smm.Middlewar
 
 		handler = sm.Authenticate(handler, route.Action, route.Subject)
 		handler = sm.GoogleRecaptcha(handler, route.Action, route.Subject)
-		handler = sm.Log(handler, route.Name, route.Action, route.Subject)
 
 		prefix.Add(route.Method, route.Path, handler)
 	}

@@ -10,7 +10,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"go-pudthai/internal/model/technical"
 	"net/http"
 	"os"
@@ -80,7 +79,6 @@ func handleValidationError(errMsg string, statusCode, errorCode *int, errorMessa
 func handleGeneralError(errorMessage *string, errorCode *int, exception *[]string) {
 	var result errorConstant
 	if err := json.Unmarshal([]byte(*errorMessage), &result); err == nil {
-		fmt.Println("result", result.Code, result.Error, result.Message)
 		*errorCode = result.Code
 		*errorMessage = result.Message
 		if result.Error != "" {

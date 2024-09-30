@@ -38,5 +38,4 @@ func (s dbController) AutoMigrate(c *fiber.Ctx) error {
 		JSON(fiber.Map{
 			"message": "Migration success",
 		})
-
 }

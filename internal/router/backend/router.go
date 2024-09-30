@@ -21,7 +21,6 @@ func InitializeBackendRoute(app *fiber.App, c bc.BackendController, sm smm.Middl
 		handler = sm.RequiredMerchant(handler, route.Action, route.Subject)
 		handler = sm.Authenticate(handler, route.Action, route.Subject)
 		handler = sm.GoogleRecaptcha(handler, route.Action, route.Subject)
-		handler = sm.Log(handler, route.Name, route.Action, route.Subject)
 
 		prefix.Add(route.Method, route.Path, handler)
 	}

@@ -36,7 +36,7 @@ func (m *middleware) Authenticate(handler fiber.Handler, action string, subject 
 
 		// ดึง secret สำหรับการยืนยัน token
 		secret := m.getSecret(c.Route().Path)
-		token, err := m.parseToken(tokenString[7:], secret) // ลบ "Bearer " ออกจาก token
+		token, err := m.parseToken(tokenString[7:], secret)
 		if err != nil {
 			return err
 		}
@@ -44,7 +44,7 @@ func (m *middleware) Authenticate(handler fiber.Handler, action string, subject 
 		// ตรวจสอบ claims ของ token
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
-			return m.unauthorizedResponse() // ถ้าไม่สามารถแปลง claims ได้ ให้ส่ง response Unauthorized
+			return m.unauthorizedResponse()
 		}
 
 		// ค้นหาผู้ใช้โดยใช้ token
@@ -59,18 +59,18 @@ func (m *middleware) Authenticate(handler fiber.Handler, action string, subject 
 		// หากไม่ใช่เส้นทางของ admin ให้ตั้งค่า merchant ใน context
 		if !strings.Contains(c.Route().Path, "/v1/admin") {
 			if err := m.setMerchantLocals(c, user.MerchantID); err != nil {
-				return err // หากไม่พบ merchant ให้คืนค่า error
+				return err
 			}
 		}
 
-		return handler(c) // ส่งต่อ request ไปยัง handler ถ้าผ่านการตรวจสอบ
+		return handler(c)
 	}
 }
 
 // validateTokenString ตรวจสอบว่า token ที่ส่งมาถูกต้องหรือไม่
 func (m *middleware) validateTokenString(tokenString string) error {
 	if tokenString == "" || len(tokenString) < 7 || !strings.HasPrefix(tokenString, "Bearer ") {
-		return m.unauthorizedResponse() // ส่ง response Unauthorized หาก token ไม่ถูกต้อง
+		return m.unauthorizedResponse()
 	}
 	return nil
 }
@@ -85,7 +85,7 @@ func (m *middleware) parseToken(tokenString, secret string) (*jwt.Token, error) 
 	})
 
 	if err != nil || !token.Valid {
-		return nil, m.unauthorizedResponse() // ส่ง response Unauthorized หาก token ไม่ถูกต้อง
+		return nil, m.unauthorizedResponse()
 	}
 
 	return token, nil // คืนค่า token ที่ถูกต้อง
@@ -118,24 +118,26 @@ func (m *middleware) getSecret(path string) string {
 
 // setUserLocals ตั้งค่าข้อมูลผู้ใช้ใน context ของ Fiber
 func (m *middleware) setUserLocals(c *fiber.Ctx, user business.GetUserResult) {
-	c.Locals(t.Member, user)                              // ตั้งค่าข้อมูลผู้ใช้ใน Locals
-	ctx := context.WithValue(c.Context(), t.Member, user) // เพิ่มข้อมูลผู้ใช้ใน context
-	c.SetUserContext(ctx)                                 // ตั้งค่า context ใหม่
+	c.Locals(t.Member, user)
+	c.Locals(t.IsAuthenticated, true)
+
+	ctx := context.WithValue(c.Context(), t.Member, user)
+	c.SetUserContext(ctx)
 }
 
 // setMerchantLocals ค้นหาและตั้งค่าข้อมูล merchant ใน context ของ Fiber
 func (m *middleware) setMerchantLocals(c *fiber.Ctx, merchantID uint) error {
 	merchant, err := m.merchantRepo.FindByID(c.Context(), merchantID)
 	if err != nil {
-		return throw.MerchantNotFound() // ส่ง error หากไม่พบ merchant
+		return throw.MerchantNotFound()
 	}
 
-	c.Locals(t.Merchant, merchant)     // ตั้งค่า merchant ใน Locals
-	c.Locals(t.MerchantID, merchantID) // ตั้งค่า MerchantID ใน Locals
+	c.Locals(t.Merchant, merchant)
+	c.Locals(t.MerchantID, merchantID)
 
-	ctx := context.WithValue(c.UserContext(), t.MerchantID, merchantID) // เพิ่ม MerchantID ใน context
-	ctx = context.WithValue(ctx, t.Merchant, merchant)                  // เพิ่มข้อมูล merchant ใน context
-	c.SetUserContext(ctx)                                               // ตั้งค่า context ใหม่
+	ctx := context.WithValue(c.UserContext(), t.MerchantID, merchantID)
+	ctx = context.WithValue(ctx, t.Merchant, merchant)
+	c.SetUserContext(ctx)
 
-	return nil // คืนค่า nil เมื่อสำเร็จ
+	return nil
 }
