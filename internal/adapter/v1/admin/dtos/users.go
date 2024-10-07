@@ -10,10 +10,10 @@ type CreateUser struct {
 	Password   string `json:"password" validate:"required,min=6"`
 	Mobile     string `json:"mobile" validate:"required,min=10"`
 	Company    string `json:"company"`
-	IsActive   int    `json:"isActive" validate:"required,one_or_zero"`
-	Type       string `json:"type" validate:"required,enum_user_type"`
+	IsActive   int    `json:"isActive" validate:"required,oneof=0 1"`
+	Type       string `json:"type" validate:"required,oneof=admin merchant user"`
 	RoleID     uint   `json:"roleId" validate:"required"`
-	IsAllBU    int    `json:"isAllBu" validate:"required,one_or_zero"`
+	IsAllBU    int    `json:"isAllBu" validate:"required,oneof=0 1"`
 	MerchantID uint   `json:"merchantId" validate:"required_if_type_not_admin"`
 }
 

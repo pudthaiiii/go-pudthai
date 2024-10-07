@@ -6,5 +6,5 @@ const (
 	IsAuthenticated ContextKey = "IsAuthenticated"
 	MerchantID      ContextKey = "MerchantID"
 	Merchant        ContextKey = "Merchant"
-	Member          ContextKey = "Member"
+	UserInfo        ContextKey = "UserInfo"
 )

@@ -22,12 +22,14 @@ func NewOauthAccessTokenRepository(db *gorm.DB) OauthAccessTokenRepository {
 
 type OauthAccessTokenRepository interface {
 	CreateTransaction(ctx context.Context, userID uint, accessExpiresAt string, refreshExpiresAt string) (entities.OauthAccessToken, entities.OauthRefreshToken, error)
-	FindUserByToken(ctx context.Context, token string) (business.GetUserResult, error)
+	FindUserByToken(ctx context.Context, token string) (business.UserInfo, error)
 }
 
 func (r *oauthAccessTokenRepository) CreateTransaction(ctx context.Context, userID uint, accessExpiresAt string, refreshExpiresAt string) (entities.OauthAccessToken, entities.OauthRefreshToken, error) {
-	var accessToken entities.OauthAccessToken
-	var refreshToken entities.OauthRefreshToken
+	var (
+		accessToken  entities.OauthAccessToken
+		refreshToken entities.OauthRefreshToken
+	)
 
 	err := r.db.Transaction(func(tx *gorm.DB) error {
 		newAccessUUID := uuid.New()
@@ -78,10 +80,9 @@ func (r *oauthAccessTokenRepository) CreateTransaction(ctx context.Context, user
 	return accessToken, refreshToken, nil
 }
 
-func (r *oauthAccessTokenRepository) FindUserByToken(ctx context.Context, token string) (business.GetUserResult, error) {
+func (r *oauthAccessTokenRepository) FindUserByToken(ctx context.Context, token string) (user business.UserInfo, err error) {
 	var (
 		accessToken entities.OauthAccessToken
-		result      business.GetUserResult
 	)
 
 	query := r.db.WithContext(ctx).
@@ -90,10 +91,10 @@ func (r *oauthAccessTokenRepository) FindUserByToken(ctx context.Context, token 
 		First(&accessToken)
 
 	if query.Error != nil {
-		return business.GetUserResult{}, query.Error
+		return user, query.Error
 	}
 
-	copier.Copy(&result, accessToken.User)
+	copier.Copy(&user, accessToken.User)
 
-	return result, nil
+	return user, nil
 }

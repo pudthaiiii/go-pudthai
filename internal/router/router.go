@@ -13,7 +13,6 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/logger"
-	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/swagger"
 	"go.elastic.co/apm/module/apmfiber"
 )
@@ -41,7 +40,7 @@ func InitializeRoute(fiber *fiber.App, r registry.Registry) *fiber.App {
 
 func appleMiddlewares(fiber *fiber.App) {
 	fiber.Use(logger.New())
-	fiber.Use(recover.New())
+	// fiber.Use(recover.New())
 	fiber.Use(apmfiber.Middleware())
 
 	fiber.Use(cors.New(cors.Config{

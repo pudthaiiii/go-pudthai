@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"go-pudthai/internal/adapter/v1/admin/dtos"
 	"go-pudthai/internal/entities"
 	t "go-pudthai/internal/model/technical"
 
@@ -18,31 +17,13 @@ func NewUsersRepository(db *gorm.DB) UsersRepository {
 }
 
 type UsersRepository interface {
-	CreateAdminUser(ctx context.Context, dto dtos.CreateUser, fileName string, password string, merchantID uint, userType string) (entities.User, error)
+	CreateAdminUser(ctx context.Context, save entities.User) (entities.User, error)
 	FindUserByEmail(ctx context.Context, email string, userType string) (entities.User, error)
 }
 
-func (r *usersRepository) CreateAdminUser(ctx context.Context, dto dtos.CreateUser, fileName string, password string, merchantID uint, userType string) (entities.User, error) {
-	var user = entities.User{
-		Email:        dto.Email,
-		Password:     string(password),
-		RoleID:       dto.RoleID,
-		ProfileImage: fileName,
-		IsActive:     dto.IsActive,
-		IsAllBU:      dto.IsAllBU,
-		FullName:     dto.FullName,
-		Mobile:       dto.Mobile,
-		Company:      dto.Company,
-		Type:         userType,
-	}
-
-	if dto.MerchantID != 0 {
-		user.MerchantID = dto.MerchantID
-	}
-
-	query := r.db.WithContext(ctx).Create(&user)
-	if query.Error != nil {
-		return user, query.Error
+func (r *usersRepository) CreateAdminUser(ctx context.Context, user entities.User) (entities.User, error) {
+	if err := r.db.WithContext(ctx).Create(&user).Error; err != nil {
+		return user, err
 	}
 
 	return user, nil
@@ -54,7 +35,7 @@ func (r *usersRepository) FindUserByEmail(ctx context.Context, email string, use
 	query := r.db.WithContext(ctx).Where("LOWER(email) = LOWER(?)", email)
 
 	if userType != "" {
-		query = query.Where("UPPER(type) = UPPER(?)", userType)
+		query = query.Where("LOWER(type) = LOWER(?)", userType)
 	}
 
 	merchantID, ok := ctx.Value(t.MerchantID).(string)

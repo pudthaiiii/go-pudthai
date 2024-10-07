@@ -117,11 +117,11 @@ func (m *middleware) getSecret(path string) string {
 }
 
 // setUserLocals ตั้งค่าข้อมูลผู้ใช้ใน context ของ Fiber
-func (m *middleware) setUserLocals(c *fiber.Ctx, user business.GetUserResult) {
-	c.Locals(t.Member, user)
+func (m *middleware) setUserLocals(c *fiber.Ctx, user business.UserInfo) {
+	c.Locals(t.UserInfo, user)
 	c.Locals(t.IsAuthenticated, true)
 
-	ctx := context.WithValue(c.Context(), t.Member, user)
+	ctx := context.WithValue(c.Context(), t.UserInfo, user)
 	c.SetUserContext(ctx)
 }
 

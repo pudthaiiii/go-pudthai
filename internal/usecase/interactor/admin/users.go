@@ -5,8 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"go-pudthai/internal/adapter/v1/admin/dtos"
+	"go-pudthai/internal/entities"
 	"go-pudthai/internal/events"
 	"go-pudthai/internal/infrastructure/datastore"
+	"go-pudthai/internal/model/business"
 	t "go-pudthai/internal/model/technical"
 	"go-pudthai/internal/throw"
 	"go-pudthai/internal/usecase/repository"
@@ -37,52 +39,48 @@ type UsersInteractor interface {
 	Create(ctx context.Context, dto dtos.CreateUser, avatar *multipart.FileHeader) (dtos.ResponseUserID, error)
 }
 
-func (u *usersInteractor) Create(ctx context.Context, dto dtos.CreateUser, file *multipart.FileHeader) (dtos.ResponseUserID, error) {
-
-	fmt.Println(ctx.Value(t.Merchant),
-		ctx.Value(t.MerchantID),
-		ctx.Value(t.Member))
-	var createUser dtos.ResponseUserID
-
-	userType, merchantID := resolveUserTypeAndMerchantID(dto.Type)
-
-	if existingUser, err := u.userRepo.FindUserByEmail(ctx, dto.Email, userType); err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return createUser, throw.UserCreate(err)
-	} else if existingUser.ID != 0 {
-		return createUser, throw.UserExists()
-	}
+func (u *usersInteractor) Create(ctx context.Context, dto dtos.CreateUser, file *multipart.FileHeader) (response dtos.ResponseUserID, err error) {
+	var (
+		createUser entities.User
+	)
 
 	fileName, err := u.handleFileUpload(ctx, file)
 	if err != nil {
-		return createUser, err
+		return response, err
+	}
+
+	userInfo := ctx.Value(t.UserInfo).(business.UserInfo)
+	if userInfo.Type != string(t.ADMIN) {
+		dto.MerchantID = userInfo.MerchantID
+	}
+
+	if existingUser, err := u.userRepo.FindUserByEmail(ctx, dto.Email, dto.Type); err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return response, throw.UserCreate(err)
+	} else if existingUser.ID != 0 {
+		return response, throw.UserExists()
 	}
 
 	hashedPassword, err := hashPassword(dto.Password)
 	if err != nil {
-		return createUser, throw.UserCreate(err)
+		return response, throw.UserCreate(err)
 	}
 
-	user, err := u.userRepo.CreateAdminUser(ctx, dto, fileName, hashedPassword, merchantID, userType)
+	copier.Copy(&createUser, &dto)
+
+	createUser.Email = strings.ToLower(dto.Email)
+	createUser.Password = string(hashedPassword)
+	createUser.ProfileImage = fileName
+
+	savedUser, err := u.userRepo.CreateAdminUser(ctx, createUser)
 	if err != nil {
-		return createUser, throw.UserCreate(err)
+		return response, throw.UserCreate(err)
 	}
 
-	copier.Copy(&createUser, &user)
+	copier.Copy(&response, &savedUser)
 
-	u.emitUserCreatedEvent(dto.Type, user)
+	u.emitUserCreatedEvent(dto.Type, savedUser)
 
-	return createUser, nil
-}
-
-func resolveUserTypeAndMerchantID(userType string) (string, uint) {
-	switch t.UserTypeEnum(strings.ToUpper(userType)) {
-	case t.ADMIN:
-		return string(t.ADMIN), 0
-	case t.MERCHANT:
-		return string(t.MERCHANT), 99
-	default:
-		return "User", 99
-	}
+	return response, nil
 }
 
 func (u *usersInteractor) handleFileUpload(ctx context.Context, file *multipart.FileHeader) (string, error) {

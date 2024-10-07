@@ -10,6 +10,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"go-pudthai/internal/model/technical"
 	"net/http"
 	"os"
@@ -32,6 +33,8 @@ type errorConstant struct {
 
 // errorHandler จัดการข้อผิดพลาดที่เกิดขึ้นในแอปพลิเคชัน
 func errorHandler(c *fiber.Ctx, err error) error {
+
+	fmt.Println("errorHandler", err, c)
 	statusCode := http.StatusInternalServerError
 	errorCode := 0
 	errorMessage := "Internal Server Error"
@@ -53,6 +56,8 @@ func handleFiberError(err *fiber.Error, statusCode, errorCode *int, errorMessage
 	*statusCode = err.Code
 	*errorCode = err.Code
 	*errorMessage = err.Message
+
+	fmt.Println("handleFiberError", err)
 
 	if strings.Contains(err.Error(), "VALIDATE_ERROR") {
 		handleValidationError(err.Error(), statusCode, errorCode, errorMessage, exception)
@@ -89,6 +94,8 @@ func handleGeneralError(errorMessage *string, errorCode *int, exception *[]strin
 
 // handleUnexpectedError จัดการข้อผิดพลาดที่ไม่คาดคิด
 func handleUnexpectedError(err error, errorCode *int, errorMessage *string, exception *[]string) {
+	fmt.Println("handleUnexpectedError", err)
+
 	*errorMessage = err.Error()
 	*exception = append(*exception, "An unexpected error occurred: "+*errorMessage)
 	*errorCode = 1000
